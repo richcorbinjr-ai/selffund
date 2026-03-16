@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self Fund Platform — Interactive Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#3D5A80;--navy2:#2E4560;--blue:#4A7FA5;
+  --teal:#2A8FA3;--teal2:#1A7A8E;--teal-bg:#EBF6F8;
+  --gold:#B5820A;--gold2:#D4990F;--gold-bg:#FDF6E3;
+  --green:#2E7D55;--green2:#3A9E6E;--green-bg:#EBF7F1;
+  --red:#C0392B;--red2:#E74C3C;--red-bg:#FDECEA;
+  --amber:#B5820A;--amber-bg:#FDF6E3;
+  --purple:#6B4FA0;--purple-bg:#F2EDF9;
+  --slate9:#2C3A4A;--slate8:#374B5E;--slate7:#4A6076;
+  --slate6:#6B7C93;--slate5:#8A9BAE;--slate4:#AAB8C7;
+  --slate3:#C8D4DF;--slate2:#E4E1D8;--slate1:#F0EDE8;--slate0:#F7F6F3;
+  --white:#FFFFFF;
+  --sidebar:220px;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+body{font-family:var(--font);background:#F7F6F3;color:var(--slate9);font-size:14px;line-height:1.5}
+
+/* SCREEN SYSTEM */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+
+/* LOGIN */
+#login-screen{background:linear-gradient(145deg,#3D5A80,#2E4560);align-items:center;justify-content:center;flex-direction:column;gap:0}
+.login-box{background:white;border-radius:16px;padding:48px;width:440px;box-shadow:0 8px 40px rgba(61,90,128,0.18)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .mark{width:52px;height:52px;background:linear-gradient(135deg,var(--teal),var(--navy));border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:white;margin-bottom:12px}
+.login-logo h1{font-size:24px;font-weight:800;color:var(--slate9);letter-spacing:-0.5px}
+.login-logo h1 span{color:var(--teal)}
+.login-logo p{font-size:13px;color:var(--slate5);margin-top:4px}
+.role-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:28px;background:var(--slate1);border-radius:10px;padding:4px}
+.role-tab{padding:8px;text-align:center;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:var(--slate5);transition:all 0.15s}
+.role-tab.active{background:white;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.login-field{margin-bottom:16px}
+.login-field label{font-size:12px;font-weight:600;color:var(--slate6);display:block;margin-bottom:6px;letter-spacing:0.03em;text-transform:uppercase}
+.login-field input{width:100%;padding:10px 14px;border:1.5px solid var(--slate2);border-radius:8px;font-family:var(--font);font-size:14px;color:var(--slate9);outline:none;transition:border-color 0.15s;background:#FAFAF8}
+.login-field input:focus{border-color:var(--teal)}
+.login-btn{width:100%;padding:12px;background:var(--navy);color:white;border:none;border-radius:8px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:background 0.15s;margin-top:8px}
+.login-btn:hover{background:var(--navy2)}
+.demo-hint{text-align:center;font-size:12px;color:var(--slate4);margin-top:16px}
+
+/* APP LAYOUT */
+.app{display:flex;min-height:100vh;width:100%}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:fixed;height:100vh;overflow-y:auto;z-index:100}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:800;color:white;letter-spacing:-0.3px}
+.logo-text span{color:rgba(255,255,255,0.6)}
+.nav-section{padding:14px 10px 6px}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:500;color:rgba(255,255,255,0.65);transition:all 0.15s;position:relative;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,0.1);color:white}
+.nav-item.active{background:rgba(255,255,255,0.15);color:white}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:rgba(255,255,255,0.7);border-radius:0 3px 3px 0}
+.nav-item .icon{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:9px;font-weight:800;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center}
+.nav-badge.teal{background:var(--teal)}
+.nav-badge.amber{background:var(--gold)}
+.nav-divider{height:1px;background:rgba(255,255,255,0.1);margin:8px 16px}
+.sidebar-user{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px}
+.user-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0}
+.avatar-teal{background:rgba(255,255,255,0.2)}
+.avatar-green{background:rgba(255,255,255,0.2)}
+.avatar-gold{background:rgba(255,255,255,0.2)}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:rgba(255,255,255,0.45)}
+.logout-btn{font-size:10px;color:rgba(255,255,255,0.35);cursor:pointer;padding:4px}
+.logout-btn:hover{color:rgba(255,255,255,0.7)}
+
+/* MAIN CONTENT */
+.main{flex:1;margin-left:var(--sidebar);display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:white;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--slate2);position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(44,58,74,0.06)}
+.topbar-left h2{font-size:16px;font-weight:800;color:var(--slate9);letter-spacing:-0.3px}
+.topbar-left p{font-size:11px;color:var(--slate4);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.top-btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s}
+.btn-primary{background:var(--teal);color:white}
+.btn-primary:hover{background:var(--teal2)}
+.btn-ghost{background:var(--slate0);color:var(--slate7);border:1.5px solid var(--slate2)}
+.btn-ghost:hover{border-color:var(--slate4);background:var(--slate1)}
+.btn-gold{background:var(--gold);color:white}
+.btn-gold:hover{background:#9A6E09}
+.btn-red{background:var(--red);color:white}
+.btn-green{background:var(--green);color:white}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:var(--slate0);border:1.5px solid var(--slate2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;position:relative}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid white}
+
+/* CONTENT */
+.content{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:16px;background:var(--slate0)}
+.alert-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:12.5px;font-weight:600}
+.alert-warn{background:var(--gold-bg);border:1px solid rgba(181,130,10,0.25);color:var(--gold)}
+.alert-info{background:var(--teal-bg);border:1px solid rgba(42,143,163,0.2);color:var(--teal2)}
+.alert-success{background:var(--green-bg);border:1px solid rgba(46,125,85,0.2);color:var(--green)}
+
+/* STAT CARDS */
+.stats-row{display:grid;gap:12px}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.stat-card{background:white;border:1.5px solid var(--slate2);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;transition:transform 0.15s,box-shadow 0.15s;cursor:default}
+.stat-card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(44,58,74,0.08)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc-teal::before{background:var(--teal)}
+.sc-gold::before{background:var(--gold)}
+.sc-green::before{background:var(--green2)}
+.sc-red::before{background:var(--red)}
+.sc-blue::before{background:var(--blue)}
+.sc-purple::before{background:var(--purple)}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--slate4);margin-bottom:6px}
+.stat-value{font-size:24px;font-weight:800;color:var(--slate9);letter-spacing:-0.5px;line-height:1}
+.stat-sub{font-size:10.5px;color:var(--slate4);margin-top:4px}
+.stat-sub.up{color:var(--green2)}
+.stat-sub.warn{color:var(--gold)}
+.stat-sub.alert{color:var(--red)}
+
+/* GRID LAYOUTS */
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:14px}
+.two-equal{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.col-stack{display:flex;flex-direction:column;gap:14px}
+
+/* PANELS */
+.panel{background:white;border:1.5px solid var(--slate2);border-radius:10px;overflow:hidden}
+.panel-header{padding:11px 16px;border-bottom:1px solid var(--slate2);display:flex;align-items:center;justify-content:space-between;background:white}
+.panel-title{font-size:12.5px;font-weight:800;color:var(--slate9);display:flex;align-items:center;gap:7px}
+.pdot{width:7px;height:7px;border-radius:50%}
+.pdot-teal{background:var(--teal)}
+.pdot-gold{background:var(--gold)}
+.pdot-green{background:var(--green2)}
+.pdot-red{background:var(--red)}
+.pdot-blue{background:var(--blue)}
+.pdot-purple{background:var(--purple)}
+.panel-link{font-size:11px;color:var(--teal);cursor:pointer;font-weight:700}
+.panel-link:hover{text-decoration:underline}
+.panel-body{padding:10px}
+
+/* ITEMS */
+.rfp-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:1.5px solid transparent;cursor:pointer;transition:all 0.15s;margin-bottom:3px}
+.rfp-item:last-child{margin-bottom:0}
+.rfp-item:hover{background:var(--slate0);border-color:var(--slate2)}
+.rfp-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ri-teal{background:var(--teal-bg)}
+.ri-gold{background:var(--gold-bg)}
+.ri-green{background:var(--green-bg)}
+.ri-red{background:var(--red-bg)}
+.ri-purple{background:var(--purple-bg)}
+.rfp-info{flex:1;min-width:0}
+.rfp-name{font-size:12.5px;font-weight:700;color:var(--slate9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rfp-meta{font-size:10.5px;color:var(--slate5);margin-top:1px}
+.rfp-right{text-align:right;flex-shrink:0}
+.rfp-date{font-size:10px;color:var(--slate4);margin-top:3px}
+
+/* STATUS PILLS */
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:9.5px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase}
+.pill-active{background:var(--teal-bg);color:var(--teal2);border:1px solid rgba(42,143,163,0.2)}
+.pill-pending{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(181,130,10,0.2)}
+.pill-new{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,85,0.2)}
+.pill-review{background:#EBF2FA;color:#4A7FA5;border:1px solid rgba(74,127,165,0.2)}
+.pill-due{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,0.2)}
+.pill-awarded{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,85,0.25)}
+.pill-draft{background:var(--slate1);color:var(--slate5);border:1px solid var(--slate2)}
+
+/* MESSAGES */
+.msg-item{display:flex;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:all 0.15s;margin-bottom:2px;border:1.5px solid transparent}
+.msg-item:hover{background:var(--slate0);border-color:var(--slate2)}
+.msg-item.unread{background:rgba(42,143,163,0.04)}
+.msg-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0}
+.ma-a{background:var(--teal)}
+.ma-b{background:var(--purple)}
+.ma-c{background:var(--gold)}
+.ma-d{background:var(--green)}
+.ma-e{background:var(--red)}
+.ma-sf{background:var(--navy)}
+.msg-info{flex:1;min-width:0}
+.msg-from{font-size:12px;font-weight:700;color:var(--slate9)}
+.msg-from.unread{color:var(--teal2)}
+.msg-preview{font-size:11px;color:var(--slate5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.msg-project{font-size:10px;color:var(--slate4);margin-top:1px}
+.msg-right{text-align:right;flex-shrink:0}
+.msg-time{font-size:10px;color:var(--slate4)}
+.unread-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);margin:3px 0 0 auto}
+
+/* TASK ITEMS */
+.task-item{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+.task-item:hover{background:var(--slate0)}
+.task-check{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--slate3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px}
+.task-check.done{border-color:var(--green2);background:rgba(58,158,110,0.12);color:var(--green2)}
+.task-info{flex:1}
+.task-title{font-size:12px;font-weight:600;color:var(--slate9)}
+.task-title.done{text-decoration:line-through;color:var(--slate4)}
+.task-ctx{font-size:10.5px;color:var(--slate5);margin-top:1px}
+.task-pri{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;flex-shrink:0;text-transform:uppercase}
+.pri-high{background:var(--red-bg);color:var(--red)}
+.pri-med{background:var(--gold-bg);color:var(--gold)}
+.pri-low{background:var(--teal-bg);color:var(--teal2)}
+
+/* CAL ITEMS */
+.cal-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all 0.15s;margin-bottom:3px;border-left:3px solid transparent}
+.cal-item:hover{background:var(--slate0)}
+.cal-urgent{border-left-color:var(--red)}
+.cal-soon{border-left-color:var(--gold)}
+.cal-ok{border-left-color:var(--teal)}
+.cal-date{text-align:center;min-width:36px}
+.cal-day{font-size:17px;font-weight:900;color:var(--slate9);line-height:1}
+.cal-month{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--slate4)}
+.cal-info{flex:1;min-width:0}
+.cal-title{font-size:12px;font-weight:700;color:var(--slate9)}
+.cal-sub{font-size:10.5px;color:var(--slate5);margin-top:1px}
+.cal-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:100px;flex-shrink:0;text-transform:uppercase}
+.tag-urgent{background:var(--red-bg);color:var(--red)}
+.tag-warn{background:var(--gold-bg);color:var(--gold)}
+.tag-info{background:var(--teal-bg);color:var(--teal2)}
+
+/* ACTIVITY */
+.act-item{display:flex;gap:9px;padding:7px 10px;font-size:11.5px;color:var(--slate5);border-bottom:1px solid var(--slate1)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.ad-teal{background:var(--teal)}
+.ad-green{background:var(--green2)}
+.ad-gold{background:var(--gold)}
+.ad-red{background:var(--red)}
+.act-text{flex:1;line-height:1.5}
+.act-text strong{color:var(--slate8);font-weight:700}
+.act-time{font-size:10px;color:var(--slate4);flex-shrink:0;padding-top:2px}
+
+/* HEALTH SCORE */
+.score-big{font-size:38px;font-weight:900;color:var(--slate9);letter-spacing:-1px;text-align:center;line-height:1}
+.score-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate4);text-align:center;margin-top:4px}
+.score-bar-row{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:6px}
+.score-bar-row:hover{background:var(--slate0)}
+.sbl{font-size:10.5px;color:var(--slate5);width:130px;flex-shrink:0}
+.sbt{flex:1;height:5px;background:var(--slate2);border-radius:3px;overflow:hidden}
+.sbf{height:100%;border-radius:3px}
+.sbv{font-size:10.5px;font-weight:700;color:var(--slate7);width:28px;text-align:right}
+
+/* TABLES */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{padding:8px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate4);border-bottom:1.5px solid var(--slate2);background:var(--slate0)}
+.data-table td{padding:10px 12px;font-size:12.5px;border-bottom:1px solid var(--slate1);vertical-align:middle;color:var(--slate9)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--slate0)}
+.data-table tbody tr{cursor:pointer}
+
+/* TABS */
+.tab-bar{display:flex;gap:2px;padding:0 24px;background:white;border-bottom:1.5px solid var(--slate2)}
+.tab{padding:12px 16px;font-size:13px;font-weight:600;color:var(--slate5);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all 0.15s;white-space:nowrap}
+.tab:hover{color:var(--slate9)}
+.tab.active{color:var(--slate9);border-bottom-color:var(--teal)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* RFP WIZARD */
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.wstep{display:flex;align-items:center;gap:8px;flex:1}
+.wstep-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:2px solid var(--slate3);color:var(--slate4);background:white}
+.wstep.done .wstep-num{background:var(--green2);border-color:var(--green2);color:white}
+.wstep.active .wstep-num{background:var(--teal);border-color:var(--teal);color:white}
+.wstep-label{font-size:11px;font-weight:600;color:var(--slate4)}
+.wstep.active .wstep-label{color:var(--slate9)}
+.wstep.done .wstep-label{color:var(--green2)}
+.wstep-line{flex:1;height:2px;background:var(--slate2);margin:0 4px}
+.wstep.done .wstep-line{background:var(--green2)}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:16px}
+.form-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--slate6);display:block;margin-bottom:6px}
+.form-input{width:100%;padding:9px 12px;border:1.5px solid var(--slate2);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--slate9);outline:none;transition:border-color 0.15s;background:#FAFAF8}
+.form-input:focus{border-color:var(--teal)}
+.form-select{width:100%;padding:9px 12px;border:1.5px solid var(--slate2);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--slate9);outline:none;background:#FAFAF8;cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.form-hint{font-size:11px;color:var(--slate4);margin-top:5px}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:100px;border:1.5px solid var(--slate2);font-size:12px;font-weight:600;color:var(--slate6);cursor:pointer;transition:all 0.15s;background:white}
+.chip:hover{border-color:var(--teal);color:var(--teal2)}
+.chip.selected{background:var(--teal-bg);border-color:var(--teal);color:var(--teal2)}
+
+/* QUOTE COMPARISON */
+.compare-table{width:100%;border-collapse:collapse}
+.compare-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:white;background:var(--navy)}
+.compare-table td{padding:10px 14px;font-size:12.5px;border-bottom:1px solid var(--slate1);vertical-align:middle;color:var(--slate9)}
+.compare-table tr.winner td{background:rgba(46,125,85,0.04)}
+.compare-table .best{color:var(--green);font-weight:800}
+.score-ring{display:flex;align-items:center;justify-content:center;gap:4px}
+.score-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:white}
+.sc-excellent{background:var(--green)}
+.sc-good{background:var(--teal)}
+.sc-fair{background:var(--gold)}
+
+/* PROGRESS BAR */
+.progress-bar{width:100%;height:6px;background:var(--slate2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--teal),var(--teal2));transition:width 0.5s}
+
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:70px;padding:0 4px}
+.bar{flex:1;border-radius:4px 4px 0 0;transition:opacity 0.15s;cursor:pointer}
+.bar:hover{opacity:0.75}
+.bar-labels{display:flex;gap:6px;padding:0 4px}
+.bar-lbl{flex:1;text-align:center;font-size:9.5px;color:var(--slate4);font-weight:600}
+
+/* QA BOARD */
+.qa-item{padding:12px;border:1.5px solid var(--slate2);border-radius:8px;margin-bottom:8px;background:white}
+.qa-item:last-child{margin-bottom:0}
+.qa-q{font-size:12.5px;font-weight:600;color:var(--slate9);margin-bottom:6px}
+.qa-meta{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--slate4);margin-bottom:8px}
+.qa-answer{background:var(--teal-bg);border-radius:6px;padding:10px;font-size:12px;color:var(--slate7);border-left:3px solid var(--teal)}
+.qa-actions{display:flex;gap:6px;margin-top:8px}
+.qa-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:var(--font)}
+.qa-btn-pub{background:var(--teal);color:white}
+.qa-btn-priv{background:var(--slate1);color:var(--slate7);border:1.5px solid var(--slate2)}
+.qa-btn-ans{background:var(--green2);color:white}
+
+/* WEIGHT SLIDERS */
+.weight-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.weight-lbl{font-size:12px;color:var(--slate6);width:160px;flex-shrink:0}
+.weight-slider{flex:1;height:4px;border-radius:2px;background:var(--slate2);outline:none;cursor:pointer}
+.weight-val{font-size:12px;font-weight:700;color:var(--slate9);width:36px;text-align:right}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:32px 16px;color:var(--slate4)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.empty-title{font-size:14px;font-weight:700;color:var(--slate5);margin-bottom:6px}
+.empty-text{font-size:12px;line-height:1.6}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.animate{animation:fadeUp 0.3s ease both}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(44,58,74,0.4);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;backdrop-filter:blur(2px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:white;border-radius:14px;padding:28px;width:520px;max-width:90vw;transform:translateY(20px);transition:transform 0.2s;box-shadow:0 20px 60px rgba(44,58,74,0.2)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:800;color:var(--slate9)}
+.modal-close{width:28px;height:28px;border-radius:6px;background:var(--slate1);border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--slate5)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--slate2)}
+
+/* SECTION HEADER */
+.section-h{font-size:13px;font-weight:800;color:var(--slate9);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--slate2)}
+
+/* PHASE BAR */
+.phase-active{background:var(--teal)!important;color:white!important}
+.phase-done{background:var(--green)!important;color:white!important}
+.phase-pending{background:var(--slate1)!important;color:var(--slate5)!important}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen" class="screen active">
+  <div class="login-box animate">
+    <div class="login-logo">
+      <div class="mark">SF</div>
+      <h1>Self<span>Fund</span></h1>
+      <p>Transparent Plan Procurement Platform</p>
+    </div>
+    <div class="role-tabs">
+      <div class="role-tab active" onclick="selectRole('vendor',this)">Vendor</div>
+      <div class="role-tab" onclick="selectRole('client',this)">Employer</div>
+      <div class="role-tab" onclick="selectRole('broker',this)">Broker</div>
+    </div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" value="james@capitalrx.com" placeholder="your@email.com">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" value="••••••••" placeholder="Password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="demo-hint">Click a role tab above then Sign In to explore that dashboard</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VENDOR APP
+══════════════════════════════════════ -->
+<div id="vendor-app" class="screen">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">SF</div>
+      <div class="logo-text">Self<span>Fund</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="vNav('v-dashboard',this)"><span class="icon">🏠</span>Dashboard</div>
+      <div class="nav-item" onclick="vNav('v-messages',this)"><span class="icon">💬</span>Messages<span class="nav-badge">7</span></div>
+      <div class="nav-item" onclick="vNav('v-tasks',this)"><span class="icon">✅</span>Tasks<span class="nav-badge">3</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Work</div>
+      <div class="nav-item" onclick="vNav('v-rfps',this)"><span class="icon">📋</span>Active RFPs<span class="nav-badge teal">4</span></div>
+      <div class="nav-item" onclick="vNav('v-invitations',this)"><span class="icon">📩</span>Invitations<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="vNav('v-calendar',this)"><span class="icon">📅</span>Calendar</div>
+      <div class="nav-item" onclick="vNav('v-qa',this)"><span class="icon">❓</span>Q&amp;A Board</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Profile</div>
+      <div class="nav-item" onclick="vNav('v-profile',this)"><span class="icon">👤</span>My Profile</div>
+      <div class="nav-item" onclick="vNav('v-performance',this)"><span class="icon">⭐</span>Performance Data<span class="nav-badge amber">!</span></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar avatar-teal">JD</div>
+      <div class="user-info">
+        <div class="user-name">James Devlin</div>
+        <div class="user-role">Capital Rx · PBM</div>
+      </div>
+      <div class="logout-btn" onclick="logout()">⬅</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="v-topbar-title">Good morning, James 👋</h2>
+        <p id="v-topbar-sub">Mar 15, 2026 · 4 active RFPs · 2 invitations need response</p>
+      </div>
+      <div class="topbar-right">
+        <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+        <button class="top-btn btn-primary" onclick="showPage('v-rfps')">Submit Quote</button>
+      </div>
+    </div>
+
+    <!-- VENDOR DASHBOARD -->
+    <div id="v-dashboard" class="content animate">
+      <div class="alert-banner alert-warn">⚠️ &nbsp;<strong>2 RFP invitations</strong> expire within 48 hours — respond to remain eligible &nbsp;<span style="cursor:pointer;text-decoration:underline" onclick="vNav('v-invitations')">View Invitations →</span></div>
+      <div class="stats-row cols-4">
+        <div class="stat-card sc-teal"><div class="stat-label">Active RFPs</div><div class="stat-value">4</div><div class="stat-sub warn">2 quotes due soon</div></div>
+        <div class="stat-card sc-red"><div class="stat-label">New Invitations</div><div class="stat-value">2</div><div class="stat-sub alert">Action required</div></div>
+        <div class="stat-card sc-green"><div class="stat-label">Win Rate (90d)</div><div class="stat-value">38%</div><div class="stat-sub up">↑ +6% vs prior period</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Unread Messages</div><div class="stat-value">7</div><div class="stat-sub">Across 3 projects</div></div>
+      </div>
+      <div class="two-col">
+        <div class="col-stack">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-teal"></span>Active RFPs &amp; Invitations</div><span class="panel-link" onclick="vNav('v-rfps')">View All →</span></div>
+            <div class="panel-body">
+              <div class="rfp-item" onclick="openProject('meridian-pbm')"><div class="rfp-icon ri-red">📋</div><div class="rfp-info"><div class="rfp-name">Meridian Manufacturing — PBM Quote</div><div class="rfp-meta">3,200 lives · Broker: Sarah Chen, Acrisure</div></div><div class="rfp-right"><span class="pill pill-due">Due Mar 17</span><div class="rfp-date">2 days left</div></div></div>
+              <div class="rfp-item" onclick="openProject('hartwell-pbm')"><div class="rfp-icon ri-teal">📋</div><div class="rfp-info"><div class="rfp-name">Hartwell Distribution — PBM Renewal</div><div class="rfp-meta">1,800 lives · Broker: Mike Torres, USI</div></div><div class="rfp-right"><span class="pill pill-active">Active</span><div class="rfp-date">Due Mar 22</div></div></div>
+              <div class="rfp-item" onclick="vNav('v-invitations')"><div class="rfp-icon ri-green">📩</div><div class="rfp-info"><div class="rfp-name">NEW: Coastal Hospital Group — PBM RFP</div><div class="rfp-meta">5,400 lives · Invitation — accept or decline</div></div><div class="rfp-right"><span class="pill pill-new">Invited</span><div class="rfp-date">Expires Mar 17</div></div></div>
+              <div class="rfp-item" onclick="vNav('v-invitations')"><div class="rfp-icon ri-gold">📩</div><div class="rfp-info"><div class="rfp-name">NEW: Southeast Logistics — PBM Quote</div><div class="rfp-meta">2,100 lives · Invitation — accept or decline</div></div><div class="rfp-right"><span class="pill pill-new">Invited</span><div class="rfp-date">Expires Mar 18</div></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-red"></span>Tasks To Complete</div><span class="panel-link">View All →</span></div>
+            <div class="panel-body">
+              <div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Upload quote — Meridian Manufacturing PBM</div><div class="task-ctx">Due Mar 17 · Meridian RFP</div></div><div class="task-pri pri-high">High</div></div>
+              <div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Accept or decline — Coastal Hospital invitation</div><div class="task-ctx">Expires in 48 hours</div></div><div class="task-pri pri-high">High</div></div>
+              <div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Reply to broker — rebate guarantee clarification</div><div class="task-ctx">Hartwell Distribution RFP · Due Mar 19</div></div><div class="task-pri pri-med">Med</div></div>
+              <div class="task-item"><div class="task-check done">✓</div><div class="task-info"><div class="task-title done">Submitted quote — Hartwell Distribution</div><div class="task-ctx">Completed Mar 12</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-stack">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Recent Messages</div><span class="panel-link" onclick="vNav('v-messages')">Inbox →</span></div>
+            <div class="panel-body">
+              <div class="msg-item unread"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from unread">Sarah Chen</div><div class="msg-preview">Can you confirm rebate guarantee applies to...</div><div class="msg-project">Meridian Mfg RFP</div></div><div class="msg-right"><div class="msg-time">2h ago</div><div class="unread-dot"></div></div></div>
+              <div class="msg-item unread"><div class="msg-avatar ma-b">MT</div><div class="msg-info"><div class="msg-from unread">Mike Torres</div><div class="msg-preview">Q&amp;A board updated — 2 new answers posted</div><div class="msg-project">Hartwell Distribution RFP</div></div><div class="msg-right"><div class="msg-time">5h ago</div><div class="unread-dot"></div></div></div>
+              <div class="msg-item"><div class="msg-avatar ma-sf">SF</div><div class="msg-info"><div class="msg-from">Self Fund Platform</div><div class="msg-preview">Performance badge upload due in 20 days</div><div class="msg-project">Platform Notification</div></div><div class="msg-right"><div class="msg-time">1d ago</div></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>Upcoming Deadlines</div><span class="panel-link" onclick="vNav('v-calendar')">Calendar →</span></div>
+            <div class="panel-body">
+              <div class="cal-item cal-urgent"><div class="cal-date"><div class="cal-day">17</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Quote Due — Meridian Mfg</div><div class="cal-sub">PBM · 3,200 lives</div></div><div class="cal-tag tag-urgent">2 Days</div></div>
+              <div class="cal-item cal-urgent"><div class="cal-date"><div class="cal-day">17</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Invitation Expires — Coastal Hospital</div><div class="cal-sub">Accept or decline required</div></div><div class="cal-tag tag-urgent">2 Days</div></div>
+              <div class="cal-item cal-soon"><div class="cal-date"><div class="cal-day">22</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Quote Due — Hartwell Distribution</div><div class="cal-sub">PBM Renewal · 1,800 lives</div></div><div class="cal-tag tag-warn">7 Days</div></div>
+              <div class="cal-item cal-ok"><div class="cal-date"><div class="cal-day">31</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Performance Data Upload Due</div><div class="cal-sub">Semi-annual · Badge renewal</div></div><div class="cal-tag tag-info">16 Days</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDOR INVITATIONS -->
+    <div id="v-invitations" class="content animate hidden">
+      <div class="section-h">RFP Invitations — Respond Required</div>
+      <div class="panel">
+        <div class="panel-body" style="padding:16px">
+          <div style="border:1.5px solid var(--red);border-radius:10px;padding:16px;margin-bottom:12px;background:var(--red-bg)">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pill pill-new">New Invitation</span><span style="font-size:11px;color:var(--red);font-weight:700">⚠ Expires Mar 17 — 2 days</span></div>
+                <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px">Coastal Hospital Group — PBM RFP</div>
+                <div style="font-size:12px;color:var(--slate5);margin-bottom:10px">5,400 covered lives · Broker: Sarah Chen, Acrisure · Quote deadline: Apr 1, 2026</div>
+                <div style="display:flex;gap:16px;font-size:12px;color:var(--slate6)">
+                  <span>📍 Florida (multi-site)</span><span>🗓 Plan year: Jan 1, 2027</span><span>💊 PBM carve-out</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-shrink:0">
+                <button class="top-btn btn-ghost" onclick="declineInvite(this)">Decline</button>
+                <button class="top-btn btn-green" onclick="acceptInvite(this,'Coastal Hospital Group')">Accept RFP</button>
+              </div>
+            </div>
+          </div>
+          <div style="border:1.5px solid var(--slate2);border-radius:10px;padding:16px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="pill pill-new">New Invitation</span><span style="font-size:11px;color:var(--amber);font-weight:700">⚠ Expires Mar 18 — 3 days</span></div>
+                <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px">Southeast Logistics — PBM Quote</div>
+                <div style="font-size:12px;color:var(--slate5);margin-bottom:10px">2,100 covered lives · Broker: David Park, Gallagher · Quote deadline: Mar 28, 2026</div>
+                <div style="display:flex;gap:16px;font-size:12px;color:var(--slate6)">
+                  <span>📍 Georgia, Tennessee</span><span>🗓 Plan year: Jul 1, 2026</span><span>💊 Full PBM replacement</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-shrink:0">
+                <button class="top-btn btn-ghost" onclick="declineInvite(this)">Decline</button>
+                <button class="top-btn btn-green" onclick="acceptInvite(this,'Southeast Logistics')">Accept RFP</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDOR MESSAGES -->
+    <div id="v-messages" class="content animate hidden">
+      <div class="section-h">Inbox — All Messages</div>
+      <div class="panel">
+        <div class="panel-body">
+          <div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from unread">Sarah Chen <span style="color:var(--slate4);font-weight:500;font-size:11px">· Acrisure</span></div><div class="msg-preview">Can you confirm the rebate guarantee percentage applies to specialty drugs as well as brand? The client specifically asked about GLP-1 coverage.</div><div class="msg-project">📋 Meridian Manufacturing PBM RFP</div></div><div class="msg-right"><div class="msg-time">2h ago</div><div class="unread-dot"></div></div></div>
+          <div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="msg-avatar ma-b">MT</div><div class="msg-info"><div class="msg-from unread">Mike Torres <span style="color:var(--slate4);font-weight:500;font-size:11px">· USI</span></div><div class="msg-preview">Q&A board has been updated with 2 new answers. Please review before submitting your final quote.</div><div class="msg-project">📋 Hartwell Distribution RFP</div></div><div class="msg-right"><div class="msg-time">5h ago</div><div class="unread-dot"></div></div></div>
+          <div class="msg-item" style="padding:12px"><div class="msg-avatar ma-sf">SF</div><div class="msg-info"><div class="msg-from">Self Fund Platform</div><div class="msg-preview">Your semi-annual performance data upload is due in 20 days. Uploading on time maintains your Gold Performance Badge.</div><div class="msg-project">🔔 Platform Notification</div></div><div class="msg-right"><div class="msg-time">1d ago</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDOR TASKS -->
+    <div id="v-tasks" class="content animate hidden">
+      <div class="section-h">My Tasks — All Projects</div>
+      <div class="panel">
+        <div class="panel-body">
+          <div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Upload quote — Meridian Manufacturing PBM</div><div class="task-ctx">Due Mar 17 (2 days) · Click to go to submission form</div></div><div class="task-pri pri-high">High</div></div>
+          <div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Accept or decline — Coastal Hospital Group invitation</div><div class="task-ctx">Expires Mar 17 · 5,400 lives</div></div><div class="task-pri pri-high">High</div></div>
+          <div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Reply to broker question on rebate guarantee</div><div class="task-ctx">Hartwell Distribution RFP · Private message from Mike Torres</div></div><div class="task-pri pri-med">Med</div></div>
+          <div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Upload semi-annual performance data</div><div class="task-ctx">Due Mar 31 · Unlocks Gold Performance Badge</div></div><div class="task-pri pri-low">Low</div></div>
+          <div class="task-item" style="padding:12px"><div class="task-check done">✓</div><div class="task-info"><div class="task-title done">Submitted quote — Hartwell Distribution</div><div class="task-ctx">Completed Mar 12</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDOR RFPS -->
+    <div id="v-rfps" class="content animate hidden">
+      <div class="section-h">Active RFPs</div>
+      <div class="panel">
+        <div class="panel-body" style="padding:0">
+          <table class="data-table">
+            <thead><tr><th>Employer</th><th>Component</th><th>Lives</th><th>Broker</th><th>Status</th><th>Deadline</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr onclick="openProject('meridian-pbm')"><td><strong>Meridian Manufacturing</strong></td><td><span class="pill pill-active">PBM</span></td><td>3,200</td><td>Sarah Chen · Acrisure</td><td><span class="pill pill-due">Quote Due</span></td><td style="color:var(--red);font-weight:700">Mar 17</td><td><button class="top-btn btn-primary" style="font-size:11px;padding:5px 10px">Submit Quote</button></td></tr>
+              <tr onclick="openProject('hartwell-pbm')"><td><strong>Hartwell Distribution</strong></td><td><span class="pill pill-active">PBM</span></td><td>1,800</td><td>Mike Torres · USI</td><td><span class="pill pill-active">Active</span></td><td>Mar 22</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:5px 10px">View RFP</button></td></tr>
+              <tr onclick="openProject('meridian-tpa')"><td><strong>Meridian Manufacturing</strong></td><td><span class="pill pill-pending">TPA</span></td><td>3,200</td><td>Sarah Chen · Acrisure</td><td><span class="pill pill-pending">Q&amp;A Open</span></td><td style="color:var(--amber)">Apr 1</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:5px 10px">View RFP</button></td></tr>
+              <tr><td><strong>Meridian Mfg (Renewal)</strong></td><td><span class="pill pill-active">PBM</span></td><td>3,200</td><td>Sarah Chen · Acrisure</td><td><span class="pill pill-review">Under Review</span></td><td>Apr 5</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:5px 10px">View RFP</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER VENDOR PAGES -->
+    <div id="v-calendar" class="content animate hidden"><div class="section-h">Calendar — All Deadlines</div><div class="panel"><div class="panel-body"><div class="cal-item cal-urgent" style="padding:12px"><div class="cal-date"><div class="cal-day">17</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Quote Due — Meridian Manufacturing PBM</div><div class="cal-sub">3,200 lives · Submit before 11:59pm</div></div><div class="cal-tag tag-urgent">2 Days</div></div><div class="cal-item cal-soon" style="padding:12px"><div class="cal-date"><div class="cal-day">22</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Quote Due — Hartwell Distribution PBM</div><div class="cal-sub">1,800 lives</div></div><div class="cal-tag tag-warn">7 Days</div></div><div class="cal-item cal-ok" style="padding:12px"><div class="cal-date"><div class="cal-day">31</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Performance Data Upload Due</div><div class="cal-sub">Semi-annual requirement</div></div><div class="cal-tag tag-info">16 Days</div></div></div></div></div>
+    <div id="v-qa" class="content animate hidden"><div class="section-h">Q&amp;A Board — Public Questions &amp; Answers</div><div class="panel"><div class="panel-body"><div class="qa-item"><div class="qa-q">Q: Does the rebate guarantee apply to specialty drugs, including GLP-1 medications?</div><div class="qa-meta"><span class="pill pill-new">Public</span><span>Hartwell Distribution RFP</span><span>Answered Mar 13</span></div><div class="qa-answer">A: Yes, the rebate guarantee applies to all brand medications including specialty and GLP-1 drugs. Rebates are guaranteed at the contract minimum regardless of actual manufacturer rebates received.</div></div><div class="qa-item"><div class="qa-q">Q: What is the current average age of the plan population?</div><div class="qa-meta"><span class="pill pill-new">Public</span><span>Hartwell Distribution RFP</span><span>Answered Mar 12</span></div><div class="qa-answer">A: Average age is 42.3 years. Full census demographics are available in the RFP document package under Section 3.</div></div></div></div></div>
+    <div id="v-profile" class="content animate hidden"><div class="section-h">My Profile — Capital Rx</div><div class="panel"><div class="panel-body" style="padding:20px"><div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" value="Capital Rx (Judi Health)"></div><div class="form-group"><label class="form-label">Website</label><input class="form-input" value="cap-rx.com"></div></div><div class="form-row"><div class="form-group"><label class="form-label">Business Categories</label><div class="chip-group"><div class="chip selected">PBM</div><div class="chip">TPA</div><div class="chip">Stop-Loss</div><div class="chip">Network</div></div></div><div class="form-group"><label class="form-label">Years of Experience</label><input class="form-input" value="12"></div></div><div class="form-group"><label class="form-label">Company Overview</label><textarea class="form-input" style="height:80px">Capital Rx is a full-service pharmacy benefit manager advancing electronic healthcare infrastructure to improve drug price visibility and patient outcomes.</textarea></div><button class="top-btn btn-primary">Save Changes</button></div></div></div>
+    <div id="v-performance" class="content animate hidden"><div class="section-h">Performance Data</div><div class="alert-banner alert-warn" style="margin-bottom:16px">⚠️ Upload your semi-annual performance data by March 31 to maintain your Gold Performance Badge</div><div class="panel"><div class="panel-body" style="padding:20px"><p style="font-size:13px;color:var(--slate6);margin-bottom:16px">Upload aggregate, de-identified performance metrics. This data powers the Self Fund benchmarking database and your Performance Badge status.</p><div class="form-group"><label class="form-label">Average Client PEPM Savings vs. Legacy PBM</label><input class="form-input" value="$18.40 PEPM (21% savings)"></div><div class="form-group"><label class="form-label">Client Retention Rate (12-month)</label><input class="form-input" value="99%"></div><div class="form-group"><label class="form-label">Net Promoter Score</label><input class="form-input" value="90 (vs. industry avg 62)"></div><button class="top-btn btn-primary">Submit Performance Data</button></div></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PROJECT DETAIL (shared)
+══════════════════════════════════════ -->
+<div id="project-detail" class="screen">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">SF</div><div class="logo-text">Self<span>Fund</span></div></div>
+    <div class="nav-section">
+      <div class="nav-item active" onclick="closeProject()">← Back to Dashboard</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">This RFP</div>
+      <div class="nav-item" onclick="projTab('tab-overview',this)">📊 Overview</div>
+      <div class="nav-item" onclick="projTab('tab-docs',this)">📄 Documents</div>
+      <div class="nav-item" onclick="projTab('tab-vendors',this)">🏢 Vendors</div>
+      <div class="nav-item" onclick="projTab('tab-qa',this)">❓ Q&amp;A Board</div>
+      <div class="nav-item" onclick="projTab('tab-quotes',this)">💰 Quotes</div>
+      <div class="nav-item" onclick="projTab('tab-messages',this)">💬 Messages<span class="nav-badge">3</span></div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar avatar-teal">JD</div>
+      <div class="user-info"><div class="user-name">James Devlin</div><div class="user-role">Capital Rx · PBM</div></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="proj-title">Meridian Manufacturing — PBM RFP</h2>
+        <p>3,200 lives · Broker: Sarah Chen, Acrisure · Quote Due Mar 17</p>
+      </div>
+      <div class="topbar-right">
+        <span class="pill pill-due" style="padding:6px 12px;font-size:11px">Quote Due Mar 17</span>
+        <button class="top-btn btn-primary" onclick="projTab('tab-quotes')">Submit My Quote</button>
+      </div>
+    </div>
+    <!-- Project Phase Bar -->
+    <div style="background:white;padding:14px 24px;border-bottom:1px solid var(--slate2)">
+      <div style="display:flex;align-items:center;gap:4px">
+        <div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px;background:var(--green);color:white;border-radius:4px">✓ RFP Launched</div>
+        <div style="width:20px;height:2px;background:var(--green2)"></div>
+        <div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px;background:var(--green);color:white;border-radius:4px">✓ Vendors Invited</div>
+        <div style="width:20px;height:2px;background:var(--green2)"></div>
+        <div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px;background:var(--teal);color:white;border-radius:4px">▶ Q&amp;A Open</div>
+        <div style="width:20px;height:2px;background:var(--slate2)"></div>
+        <div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px;background:var(--slate1);color:var(--slate5);border-radius:4px">Quote Submission</div>
+        <div style="width:20px;height:2px;background:var(--slate2)"></div>
+        <div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px;background:var(--slate1);color:var(--slate5);border-radius:4px">Comparison</div>
+        <div style="width:20px;height:2px;background:var(--slate2)"></div>
+        <div style="flex:1;text-align:center;font-size:10px;font-weight:700;padding:6px;background:var(--slate1);color:var(--slate5);border-radius:4px">Award</div>
+      </div>
+    </div>
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab active" id="tb-overview" onclick="projTab('tab-overview',this)">Overview</div>
+      <div class="tab" id="tb-docs" onclick="projTab('tab-docs',this)">Documents</div>
+      <div class="tab" id="tb-vendors" onclick="projTab('tab-vendors',this)">Vendors (5)</div>
+      <div class="tab" id="tb-qa" onclick="projTab('tab-qa',this)">Q&amp;A Board (4)</div>
+      <div class="tab" id="tb-quotes" onclick="projTab('tab-quotes',this)">Submit Quote</div>
+      <div class="tab" id="tb-messages" onclick="projTab('tab-messages',this)">Messages (3)</div>
+    </div>
+
+    <div class="content animate">
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview" class="tab-content active">
+        <div class="two-col">
+          <div class="col-stack">
+            <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-teal"></span>RFP Details</div></div><div class="panel-body" style="padding:16px"><table style="width:100%;border-collapse:collapse"><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);width:140px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Employer</td><td style="font-size:13px;font-weight:600;color:var(--navy)">Meridian Manufacturing</td></tr><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Component</td><td><span class="pill pill-active">PBM</span></td></tr><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Covered Lives</td><td style="font-size:13px;font-weight:600;color:var(--navy)">3,200</td></tr><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Plan Year</td><td style="font-size:13px;color:var(--navy)">Jan 1 – Dec 31, 2027</td></tr><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Broker</td><td style="font-size:13px;color:var(--navy)">Sarah Chen, Acrisure</td></tr><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Q&amp;A Closes</td><td style="font-size:13px;color:var(--amber);font-weight:700">Mar 16 (Tomorrow)</td></tr><tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Quote Deadline</td><td style="font-size:13px;color:var(--red);font-weight:700">Mar 17 — 2 days</td></tr></table></div></div>
+            <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>RFP Description</div></div><div class="panel-body" style="padding:16px;font-size:13px;color:var(--slate7);line-height:1.7">Meridian Manufacturing is seeking a transparent, pass-through PBM to replace their current legacy arrangement. Key priorities: maximum rebate pass-through, GLP-1 management program, specialty drug cost containment, and real-time reporting. The employer currently spends approximately $2.8M annually on pharmacy benefits across 3,200 covered lives.</div></div>
+          </div>
+          <div class="col-stack">
+            <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-red"></span>Your Action Required</div></div><div class="panel-body" style="padding:16px"><div style="background:var(--red-bg);border:1.5px solid rgba(220,38,38,0.2);border-radius:8px;padding:12px;margin-bottom:12px"><div style="font-size:12px;font-weight:800;color:var(--red);margin-bottom:4px">Quote Due in 2 Days — Mar 17</div><div style="font-size:12px;color:var(--slate6)">Upload your PBM quote and fee schedule. Late submissions will not be accepted.</div></div><button class="top-btn btn-primary" style="width:100%;margin-bottom:8px" onclick="projTab('tab-quotes')">Go to Quote Submission →</button><button class="top-btn btn-ghost" style="width:100%" onclick="projTab('tab-qa')">View Q&amp;A Board (4 answers)</button></div></div>
+            <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Vendor Responses</div></div><div class="panel-body" style="padding:12px"><div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate5);margin-bottom:4px"><span>Vendors Responded</span><span style="font-weight:700;color:var(--navy)">3 of 5</span></div><div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div></div><div style="font-size:11px;color:var(--slate4)">2 vendors pending · Q&amp;A closes tomorrow</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS TAB -->
+      <div id="tab-docs" class="tab-content hidden">
+        <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>RFP Documents</div></div><div class="panel-body" style="padding:0"><table class="data-table"><thead><tr><th>Document</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Action</th></tr></thead><tbody><tr><td>📄 Meridian_RFP_Package_2027.pdf</td><td>RFP Document</td><td>2.4 MB</td><td>Mar 8, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr><tr><td>📊 Meridian_Census_2026.xlsx</td><td>Census Data</td><td>840 KB</td><td>Mar 8, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr><tr><td>📈 Claims_History_24mo.pdf</td><td>Claims Data</td><td>1.1 MB</td><td>Mar 8, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr><tr><td>💊 Current_PBM_Contract.pdf</td><td>Reference</td><td>680 KB</td><td>Mar 8, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr></tbody></table></div></div>
+      </div>
+
+      <!-- VENDORS TAB -->
+      <div id="tab-vendors" class="tab-content hidden">
+        <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-purple"></span>Invited Vendors — Blind Bid</div><div style="font-size:11px;color:var(--slate4)">Vendors cannot see each other's identities or quotes</div></div><div class="panel-body" style="padding:0"><table class="data-table"><thead><tr><th>Vendor</th><th>Category</th><th>Status</th><th>Quote Submitted</th></tr></thead><tbody><tr><td>Capital Rx (You)</td><td><span class="pill pill-active">PBM</span></td><td><span class="pill pill-active">Active</span></td><td><span style="color:var(--amber)">Pending — Due Mar 17</span></td></tr><tr><td>Vendor #2</td><td><span class="pill pill-active">PBM</span></td><td><span class="pill pill-active">Active</span></td><td><span style="color:var(--green2)">✓ Submitted Mar 14</span></td></tr><tr><td>Vendor #3</td><td><span class="pill pill-active">PBM</span></td><td><span class="pill pill-active">Active</span></td><td><span style="color:var(--green2)">✓ Submitted Mar 13</span></td></tr><tr><td>Vendor #4</td><td><span class="pill pill-active">PBM</span></td><td><span class="pill pill-pending">Pending</span></td><td>—</td></tr><tr><td>Vendor #5</td><td><span class="pill pill-active">PBM</span></td><td><span class="pill pill-pending">Pending</span></td><td>—</td></tr></tbody></table></div></div>
+      </div>
+
+      <!-- Q&A TAB -->
+      <div id="tab-qa" class="tab-content hidden">
+        <div class="two-col">
+          <div>
+            <div class="section-h">Public Q&amp;A Board</div>
+            <div class="qa-item"><div class="qa-q">1. Does the rebate guarantee apply to specialty drugs, including GLP-1 medications?</div><div class="qa-meta"><span class="pill pill-new">Public — All Vendors</span><span>Answered Mar 13</span></div><div class="qa-answer">Yes, the rebate guarantee applies to all brand medications including specialty and GLP-1 drugs. Guaranteed minimums apply regardless of actual manufacturer rebates received.</div></div>
+            <div class="qa-item"><div class="qa-q">2. What is the current average age of the plan population?</div><div class="qa-meta"><span class="pill pill-new">Public — All Vendors</span><span>Answered Mar 12</span></div><div class="qa-answer">Average age is 42.3 years. Full census demographics are in the RFP package under Section 3.</div></div>
+            <div class="qa-item"><div class="qa-q">3. Is the employer open to a biosimilar-first formulary strategy?</div><div class="qa-meta"><span class="pill pill-new">Public — All Vendors</span><span>Answered Mar 11</span></div><div class="qa-answer">Yes, the employer is open to a biosimilar-first approach with appropriate member communication and step-therapy protocols in place.</div></div>
+            <div class="qa-item"><div class="qa-q">4. Are there any known high-cost claimants in the current plan year?</div><div class="qa-meta"><span class="pill pill-due">Broker Answering</span><span>Due Mar 16</span></div><div class="qa-answer" style="background:var(--amber-bg);border-left-color:var(--amber);color:var(--amber)">⏳ Awaiting broker response — expected by tomorrow</div></div>
+          </div>
+          <div>
+            <div class="section-h">Submit a Question</div>
+            <div class="panel"><div class="panel-body" style="padding:16px"><div class="form-group"><label class="form-label">Your Question</label><textarea class="form-input" style="height:100px" placeholder="Type your question here. The broker will review and decide whether to answer publicly (to all vendors) or privately (to you only)."></textarea><div class="form-hint">Questions submitted through Mar 16. Your identity is not revealed to other vendors.</div></div><button class="top-btn btn-primary" style="width:100%">Submit Question</button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUOTE SUBMISSION TAB -->
+      <div id="tab-quotes" class="tab-content hidden">
+        <div class="alert-banner alert-warn" style="margin-bottom:16px">⏰ Quote deadline: <strong>Mar 17, 2026 at 11:59 PM</strong> — 2 days remaining. Once submitted, quotes cannot be changed.</div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-teal"></span>PBM Quote — Meridian Manufacturing</div></div>
+            <div class="panel-body" style="padding:20px">
+              <div class="form-group"><label class="form-label">Base PEPM Administration Fee</label><input class="form-input" placeholder="e.g. $4.50 PEPM"></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Brand Rebate Guarantee (% WAC)</label><input class="form-input" placeholder="e.g. 8.5%"></div>
+                <div class="form-group"><label class="form-label">Specialty Drug PEPM</label><input class="form-input" placeholder="e.g. $12.00 PEPM"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Generic Effective Rate vs. AWP</label><input class="form-input" placeholder="e.g. 78% off AWP"></div>
+                <div class="form-group"><label class="form-label">Brand Effective Rate vs. WAC</label><input class="form-input" placeholder="e.g. 12% off WAC"></div>
+              </div>
+              <div class="form-group"><label class="form-label">GLP-1 Management Program</label><select class="form-select"><option>Yes — included in PEPM</option><option>Yes — additional fee</option><option>No</option></select></div>
+              <div class="form-group"><label class="form-label">Implementation Timeline</label><select class="form-select"><option>30 days</option><option>60 days</option><option>90 days</option></select></div>
+              <div class="form-group"><label class="form-label">Additional Notes / Value-Adds</label><textarea class="form-input" style="height:80px" placeholder="Any additional context, programs, or commitments to include in your quote..."></textarea></div>
+              <div class="form-group"><label class="form-label">Upload Quote Document (PDF, Excel)</label><input type="file" style="font-size:13px;color:var(--slate6)"></div>
+              <button class="top-btn btn-primary" style="width:100%;padding:12px;font-size:14px" onclick="submitQuote()">Submit Quote →</button>
+            </div>
+          </div>
+          <div class="col-stack">
+            <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>What Happens After Submission</div></div><div class="panel-body" style="padding:16px"><div style="font-size:12px;color:var(--slate6);line-height:1.8"><div style="margin-bottom:8px">1️⃣ Your quote is <strong>locked</strong> — no changes allowed after submission</div><div style="margin-bottom:8px">2️⃣ Broker receives notification that you have submitted</div><div style="margin-bottom:8px">3️⃣ All quotes are collected until Mar 17 deadline</div><div style="margin-bottom:8px">4️⃣ Broker generates normalized comparison view</div><div>5️⃣ You receive a competitiveness signal after selection (win or not selected + percentile ranking)</div></div></div></div>
+            <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Blind Bid Notice</div></div><div class="panel-body" style="padding:16px"><div style="font-size:12px;color:var(--slate6);line-height:1.7">Your pricing is <strong>never shared</strong> with other vendors. Competitors only know a general competitiveness percentile — not your specific numbers. This protects the integrity of the bid process.</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES TAB -->
+      <div id="tab-messages" class="tab-content hidden">
+        <div class="two-col">
+          <div>
+            <div class="section-h">Project Messages</div>
+            <div class="panel"><div class="panel-body">
+              <div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from unread">Sarah Chen <span style="font-size:10px;color:var(--teal);background:var(--teal-bg);padding:1px 6px;border-radius:4px">Broker</span></div><div class="msg-preview" style="white-space:normal;line-height:1.5;margin-top:4px">Hi James — can you confirm whether Capital Rx's rebate guarantee also applies to specialty medications? The client CFO specifically asked about GLP-1 drugs like Ozempic and Wegovy. They have 3 employees currently on GLP-1 therapy.</div><div class="msg-project">Mar 15, 10:24 AM</div></div></div>
+              <div class="msg-item" style="padding:12px;border-bottom:1px solid var(--slate1);background:rgba(8,145,178,0.03)"><div class="msg-avatar ma-a">JD</div><div class="msg-info"><div class="msg-from">You <span style="font-size:10px;color:var(--slate4);padding:1px 6px">Capital Rx</span></div><div class="msg-preview" style="white-space:normal;line-height:1.5;margin-top:4px">Hi Sarah — yes, our rebate guarantee applies to all brand medications including specialty and GLP-1 drugs. I'll also address this in my formal quote. Would it help to include our specific GLP-1 management program details?</div><div class="msg-project">Mar 15, 2:15 PM</div></div></div>
+              <div class="msg-item unread" style="padding:12px"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from unread">Sarah Chen</div><div class="msg-preview" style="white-space:normal;line-height:1.5;margin-top:4px">That would be very helpful — yes please include the GLP-1 program details. Also, are you able to provide a 12-month rate guarantee for the PEPM admin fee?</div><div class="msg-project">Mar 15, 3:41 PM</div></div></div>
+            </div></div>
+          </div>
+          <div>
+            <div class="section-h">Reply</div>
+            <div class="panel"><div class="panel-body" style="padding:16px"><textarea class="form-input" style="height:120px;margin-bottom:10px" placeholder="Type your reply to Sarah Chen..."></textarea><div style="display:flex;justify-content:flex-end"><button class="top-btn btn-primary">Send Message</button></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CLIENT APP
+══════════════════════════════════════ -->
+<div id="client-app" class="screen">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">SF</div><div class="logo-text">Self<span>Fund</span></div></div>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="cNav('c-dashboard',this)"><span class="icon">🏠</span>Dashboard</div>
+      <div class="nav-item" onclick="cNav('c-messages',this)"><span class="icon">💬</span>Messages<span class="nav-badge teal">3</span></div>
+      <div class="nav-item" onclick="cNav('c-tasks',this)"><span class="icon">✅</span>Tasks</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Plan Management</div>
+      <div class="nav-item" onclick="cNav('c-projects',this)"><span class="icon">📋</span>My Projects<span class="nav-badge teal">2</span></div>
+      <div class="nav-item" onclick="cNav('c-health',this)"><span class="icon">📊</span>Plan Health Score</div>
+      <div class="nav-item" onclick="cNav('c-calendar',this)"><span class="icon">📅</span>Renewal Calendar</div>
+      <div class="nav-item" onclick="cNav('c-vendors',this)"><span class="icon">🏢</span>Vendors &amp; Contracts</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Reports</div>
+      <div class="nav-item" onclick="cNav('c-savings',this)"><span class="icon">💰</span>Savings Reports</div>
+      <div class="nav-item" onclick="cNav('c-setup',this)"><span class="icon">⚙️</span>Setup Questionnaire</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar avatar-green">KP</div>
+      <div class="user-info"><div class="user-name">Karen Park</div><div class="user-role">Meridian Mfg · VP HR</div></div>
+      <div class="logout-btn" onclick="logout()">⬅</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="c-topbar-title">Meridian Manufacturing — Plan Dashboard</h2>
+        <p>3,200 covered lives · Plan year Jan 1 – Dec 31, 2025 · Renewal in 291 days</p>
+      </div>
+      <div class="topbar-right">
+        <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+        <button class="top-btn btn-ghost">Ask Broker</button>
+        <button class="top-btn btn-green">Start New RFP</button>
+      </div>
+    </div>
+
+    <div id="c-dashboard" class="content animate">
+      <div class="alert-banner alert-success">✅ &nbsp;<strong>PBM RFP complete</strong> — documented first-year savings of $1.24M ready for review &nbsp;<span style="cursor:pointer;text-decoration:underline" onclick="cNav('c-savings')">View Report →</span></div>
+      <div class="stats-row cols-4">
+        <div class="stat-card sc-green"><div class="stat-label">Plan Health Score</div><div class="stat-value">74<span style="font-size:13px;color:var(--slate4)">/100</span></div><div class="stat-sub up">↑ +8 pts since Jan</div></div>
+        <div class="stat-card sc-gold"><div class="stat-label">Documented Savings</div><div class="stat-value">$1.24M</div><div class="stat-sub up">First-year PBM savings</div></div>
+        <div class="stat-card sc-teal"><div class="stat-label">Active Projects</div><div class="stat-value">2</div><div class="stat-sub">Stop-loss renewal active</div></div>
+        <div class="stat-card sc-purple"><div class="stat-label">Renewal In</div><div class="stat-value">291d</div><div class="stat-sub warn">TPA review recommended</div></div>
+      </div>
+      <div class="two-col">
+        <div class="col-stack">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-green"></span>Plan Health Score Breakdown</div><span class="panel-link" onclick="cNav('c-health')">Full Report →</span></div>
+            <div class="panel-body">
+              <div style="text-align:center;padding:12px 0 8px"><div class="score-big">74</div><div class="score-lbl">Plan Health Score · Good</div></div>
+              <div class="score-bar-row"><div class="sbl">Vendor Compliance</div><div class="sbt"><div class="sbf" style="width:82%;background:var(--green2)"></div></div><div class="sbv">82</div></div>
+              <div class="score-bar-row"><div class="sbl">Cost vs. Market</div><div class="sbt"><div class="sbf" style="width:68%;background:var(--amber)"></div></div><div class="sbv">68</div></div>
+              <div class="score-bar-row"><div class="sbl">Renewal Readiness</div><div class="sbt"><div class="sbf" style="width:71%;background:var(--teal)"></div></div><div class="sbv">71</div></div>
+              <div class="score-bar-row"><div class="sbl">Fiduciary Docs</div><div class="sbt"><div class="sbf" style="width:90%;background:var(--green2)"></div></div><div class="sbv">90</div></div>
+              <div class="score-bar-row"><div class="sbl">Claims Risk</div><div class="sbt"><div class="sbf" style="width:61%;background:var(--amber)"></div></div><div class="sbv">61</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-teal"></span>Active RFP — Stop-Loss Renewal</div><span class="panel-link">View RFP →</span></div>
+            <div class="panel-body" style="padding:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div><div style="font-size:14px;font-weight:800;color:var(--navy)">Stop-Loss Renewal — Jan 1, 2027</div><div style="font-size:12px;color:var(--slate5);margin-top:2px">5 carriers invited · 3 quotes received</div></div>
+                <span class="pill pill-review">Under Review</span>
+              </div>
+              <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate5);margin-bottom:4px"><span>Quotes Received</span><span style="font-weight:700">3 of 5</span></div><div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div></div>
+              <div class="bar-chart" style="margin-top:12px">
+                <div class="bar" style="height:75%;background:var(--teal)" title="Sun Life"></div>
+                <div class="bar" style="height:60%;background:var(--teal);opacity:0.7" title="HM Life"></div>
+                <div class="bar" style="height:90%;background:var(--green2)" title="Tokio Marine"></div>
+                <div class="bar" style="height:40%;background:var(--slate2)" title="Pending"></div>
+                <div class="bar" style="height:40%;background:var(--slate2)" title="Pending"></div>
+              </div>
+              <div class="bar-labels"><div class="bar-lbl">Sun Life</div><div class="bar-lbl">HM Life</div><div class="bar-lbl">Tokio</div><div class="bar-lbl">Pending</div><div class="bar-lbl">Pending</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-stack">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Messages from Broker</div><span class="panel-link" onclick="cNav('c-messages')">View All →</span></div>
+            <div class="panel-body">
+              <div class="msg-item unread"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from unread">Sarah Chen (Broker)</div><div class="msg-preview">Tokio Marine quote received — very strong terms...</div><div class="msg-project">Stop-Loss RFP</div></div><div class="msg-right"><div class="msg-time">1h ago</div><div class="unread-dot"></div></div></div>
+              <div class="msg-item unread"><div class="msg-avatar ma-sf">SF</div><div class="msg-info"><div class="msg-from unread">Self Fund</div><div class="msg-preview">PBM savings report ready — $1.24M documented</div><div class="msg-project">Platform Report</div></div><div class="msg-right"><div class="msg-time">3h ago</div><div class="unread-dot"></div></div></div>
+              <div class="msg-item"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from">Sarah Chen (Broker)</div><div class="msg-preview">TPA benchmark analysis attached for review</div><div class="msg-project">Plan Benchmarking</div></div><div class="msg-right"><div class="msg-time">2d ago</div></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>Renewal Timeline</div><span class="panel-link" onclick="cNav('c-calendar')">Full Calendar →</span></div>
+            <div class="panel-body">
+              <div class="cal-item cal-soon"><div class="cal-date"><div class="cal-day">24</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Stop-Loss RFP Closes</div><div class="cal-sub">Review quotes with broker</div></div><div class="cal-tag tag-warn">9 Days</div></div>
+              <div class="cal-item cal-ok"><div class="cal-date"><div class="cal-day">1</div><div class="cal-month">Apr</div></div><div class="cal-info"><div class="cal-title">TPA Contract Review</div><div class="cal-sub">Annual performance assessment</div></div><div class="cal-tag tag-warn">17 Days</div></div>
+              <div class="cal-item cal-ok"><div class="cal-date"><div class="cal-day">1</div><div class="cal-month">Jan</div></div><div class="cal-info"><div class="cal-title">Plan Year Renewal</div><div class="cal-sub">291 days · All vendors</div></div><div class="cal-tag tag-info">291 Days</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="c-messages" class="content animate hidden"><div class="section-h">Messages</div><div class="panel"><div class="panel-body"><div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="msg-avatar ma-c">SC</div><div class="msg-info"><div class="msg-from unread">Sarah Chen <span style="font-size:10px;color:var(--teal);background:var(--teal-bg);padding:1px 6px;border-radius:4px">Broker</span></div><div class="msg-preview" style="white-space:normal;line-height:1.5;margin-top:4px">Karen — Tokio Marine's stop-loss quote came in this morning and it looks very strong. Their specific deductible is at $75K (same as current) with no new lasers and a rate cap of 15% on renewal. I'll prepare the full comparison by Friday. Can we schedule a 30-minute call next week to review?</div><div class="msg-project" style="margin-top:6px">📋 Stop-Loss Renewal RFP</div></div><div class="msg-right"><div class="msg-time">1h ago</div><div class="unread-dot"></div></div></div></div></div></div>
+    <div id="c-tasks" class="content animate hidden"><div class="section-h">My Tasks</div><div class="panel"><div class="panel-body"><div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Review stop-loss quote comparison from Sarah</div><div class="task-ctx">Expected by Mar 20 · Stop-Loss RFP</div></div><div class="task-pri pri-med">Med</div></div><div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check done">✓</div><div class="task-info"><div class="task-title done">Review and approve PBM vendor selection</div><div class="task-ctx">Completed Mar 10</div></div></div></div></div></div>
+    <div id="c-projects" class="content animate hidden"><div class="section-h">My Projects</div><div class="panel"><div class="panel-body" style="padding:0"><table class="data-table"><thead><tr><th>Project</th><th>Component</th><th>Broker</th><th>Status</th><th>Deadline</th><th>Action</th></tr></thead><tbody><tr><td><strong>PBM Competitive Bid 2027</strong></td><td><span class="pill pill-active">PBM</span></td><td>Sarah Chen</td><td><span class="pill pill-awarded">Awarded</span></td><td>Complete</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr><tr><td><strong>Stop-Loss Renewal 2027</strong></td><td><span class="pill pill-review">Stop-Loss</span></td><td>Sarah Chen</td><td><span class="pill pill-review">Quotes In</span></td><td style="color:var(--amber);font-weight:700">Mar 24</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr></tbody></table></div></div></div>
+    <div id="c-health" class="content animate hidden"><div class="section-h">Plan Health Score — Full Breakdown</div><div class="two-col"><div class="panel"><div class="panel-body" style="padding:20px"><div style="text-align:center;padding:16px 0"><div class="score-big">74</div><div class="score-lbl">Overall Plan Health Score</div><div style="font-size:12px;color:var(--green2);margin-top:6px;font-weight:700">↑ +8 points since January</div></div><div class="score-bar-row"><div class="sbl">Vendor Compliance (25%)</div><div class="sbt"><div class="sbf" style="width:82%;background:var(--green2)"></div></div><div class="sbv">82</div></div><div class="score-bar-row"><div class="sbl">Cost vs. Market (25%)</div><div class="sbt"><div class="sbf" style="width:68%;background:var(--amber)"></div></div><div class="sbv">68</div></div><div class="score-bar-row"><div class="sbl">Renewal Readiness (15%)</div><div class="sbt"><div class="sbf" style="width:71%;background:var(--teal)"></div></div><div class="sbv">71</div></div><div class="score-bar-row"><div class="sbl">Fiduciary Docs (15%)</div><div class="sbt"><div class="sbf" style="width:90%;background:var(--green2)"></div></div><div class="sbv">90</div></div><div class="score-bar-row"><div class="sbl">Claims Risk (20%)</div><div class="sbt"><div class="sbf" style="width:61%;background:var(--amber)"></div></div><div class="sbv">61</div></div></div></div><div class="col-stack"><div class="panel"><div class="panel-header"><div class="panel-title">⚡ Action Items to Improve Score</div></div><div class="panel-body" style="padding:16px"><div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Complete TPA contract benchmarking review</div><div class="task-ctx">Improves Cost vs. Market by ~8 points</div></div><div class="task-pri pri-med">Med</div></div><div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Identify and document high-cost claimant strategy</div><div class="task-ctx">Improves Claims Risk by ~10 points</div></div><div class="task-pri pri-med">Med</div></div></div></div></div></div></div>
+    <div id="c-savings" class="content animate hidden"><div class="section-h">Savings Reports</div><div class="alert-banner alert-success" style="margin-bottom:16px">✅ $1.24M in documented first-year PBM savings — ready for board presentation</div><div class="panel"><div class="panel-body" style="padding:20px"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px"><div style="text-align:center;padding:16px;background:var(--green-bg);border-radius:10px"><div style="font-size:28px;font-weight:900;color:var(--green)">$1.24M</div><div style="font-size:11px;color:var(--green);font-weight:700;margin-top:4px">First-Year Savings</div></div><div style="text-align:center;padding:16px;background:var(--teal-bg);border-radius:10px"><div style="font-size:28px;font-weight:900;color:var(--teal)">21%</div><div style="font-size:11px;color:var(--teal);font-weight:700;margin-top:4px">Cost Reduction vs. Legacy PBM</div></div><div style="text-align:center;padding:16px;background:var(--gold-bg);border-radius:10px"><div style="font-size:28px;font-weight:900;color:var(--gold)">$388K</div><div style="font-size:11px;color:var(--gold);font-weight:700;margin-top:4px">Rebate Pass-Through (12mo)</div></div></div><button class="top-btn btn-primary">Download PDF Report</button></div></div></div>
+    <div id="c-vendors" class="content animate hidden"><div class="section-h">Vendors &amp; Contracts</div><div class="panel"><div class="panel-body" style="padding:0"><table class="data-table"><thead><tr><th>Vendor</th><th>Category</th><th>Contract Start</th><th>Renewal Date</th><th>Status</th></tr></thead><tbody><tr><td><strong>Capital Rx (Judi Health)</strong></td><td><span class="pill pill-active">PBM</span></td><td>Jan 1, 2027</td><td>Dec 31, 2027</td><td><span class="pill pill-new">Newly Awarded</span></td></tr><tr><td><strong>Trustmark Health Benefits</strong></td><td><span class="pill pill-review">TPA</span></td><td>Jan 1, 2025</td><td>Dec 31, 2026</td><td><span class="pill pill-active">Active</span></td></tr><tr><td><strong>TBD — Stop-Loss</strong></td><td><span class="pill pill-pending">Stop-Loss</span></td><td>Jan 1, 2027</td><td>—</td><td><span class="pill pill-review">RFP In Progress</span></td></tr></tbody></table></div></div></div>
+    <div id="c-calendar" class="content animate hidden"><div class="section-h">Renewal Calendar</div><div class="panel"><div class="panel-body"><div class="cal-item cal-soon" style="padding:12px"><div class="cal-date"><div class="cal-day">24</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Stop-Loss RFP Closes</div><div class="cal-sub">Review quotes with broker Sarah Chen</div></div><div class="cal-tag tag-warn">9 Days</div></div><div class="cal-item cal-ok" style="padding:12px"><div class="cal-date"><div class="cal-day">1</div><div class="cal-month">Apr</div></div><div class="cal-info"><div class="cal-title">TPA Annual Performance Review</div><div class="cal-sub">Trustmark Health Benefits</div></div><div class="cal-tag tag-warn">17 Days</div></div><div class="cal-item cal-ok" style="padding:12px"><div class="cal-date"><div class="cal-day">1</div><div class="cal-month">Jan</div></div><div class="cal-info"><div class="cal-title">Full Plan Year Renewal</div><div class="cal-sub">All vendors · 291 days away</div></div><div class="cal-tag tag-info">291 Days</div></div></div></div></div>
+    <div id="c-setup" class="content animate hidden"><div class="section-h">Setup Questionnaire — Client Profile</div><div class="panel"><div class="panel-body" style="padding:16px"><div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--slate5);margin-bottom:6px"><span>Profile Completion</span><span style="font-weight:800;color:var(--green2)">94% Complete</span></div><div class="progress-bar"><div class="progress-fill" style="width:94%"></div></div></div><div style="font-size:12px;color:var(--amber);font-weight:600;padding:10px;background:var(--amber-bg);border-radius:6px">2 questions remaining — complete your profile to unlock full vendor matching</div></div></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BROKER APP
+══════════════════════════════════════ -->
+<div id="broker-app" class="screen">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">SF</div><div class="logo-text">Self<span>Fund</span></div></div>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="bNav('b-dashboard',this)"><span class="icon">🏠</span>Dashboard</div>
+      <div class="nav-item" onclick="bNav('b-messages',this)"><span class="icon">💬</span>Messages<span class="nav-badge">11</span></div>
+      <div class="nav-item" onclick="bNav('b-qa-queue',this)"><span class="icon">❓</span>Q&amp;A Queue<span class="nav-badge">5</span></div>
+      <div class="nav-item" onclick="bNav('b-tasks',this)"><span class="icon">✅</span>Tasks<span class="nav-badge amber">4</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Work</div>
+      <div class="nav-item" onclick="bNav('b-rfps',this)"><span class="icon">📋</span>All RFPs<span class="nav-badge teal">6</span></div>
+      <div class="nav-item" onclick="bNav('b-clients',this)"><span class="icon">👥</span>My Clients<span class="nav-badge teal">12</span></div>
+      <div class="nav-item" onclick="bNav('b-calendar',this)"><span class="icon">📅</span>Master Calendar</div>
+      <div class="nav-item" onclick="showNewRFP()"><span class="icon">➕</span>New RFP</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Intelligence</div>
+      <div class="nav-item" onclick="bNav('b-compare',this)"><span class="icon">📊</span>Quote Comparison</div>
+      <div class="nav-item"><span class="icon">📈</span>Analytics</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar avatar-gold">SC</div>
+      <div class="user-info"><div class="user-name">Sarah Chen</div><div class="user-role">Acrisure · Sr. Advisor</div></div>
+      <div class="logout-btn" onclick="logout()">⬅</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="b-topbar-title">Broker Command Center</h2>
+        <p>12 active clients · 6 open RFPs · 5 Q&amp;A responses needed · 11 unread messages</p>
+      </div>
+      <div class="topbar-right">
+        <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+        <button class="top-btn btn-ghost">Benchmarks</button>
+        <button class="top-btn btn-gold" onclick="showNewRFP()">+ New RFP</button>
+      </div>
+    </div>
+
+    <div id="b-dashboard" class="content animate">
+      <div class="alert-banner alert-warn">⚠️ &nbsp;<strong>5 Q&amp;A questions</strong> pending your response across 3 RFPs — vendors are waiting &nbsp;<span style="cursor:pointer;text-decoration:underline" onclick="bNav('b-qa-queue')">Answer Now →</span></div>
+      <div class="stats-row cols-4">
+        <div class="stat-card sc-gold"><div class="stat-label">Active Clients</div><div class="stat-value">12</div><div class="stat-sub up">3 renewals this quarter</div></div>
+        <div class="stat-card sc-teal"><div class="stat-label">Open RFPs</div><div class="stat-value">6</div><div class="stat-sub">Across 5 clients</div></div>
+        <div class="stat-card sc-green"><div class="stat-label">Total Savings Generated</div><div class="stat-value">$4.1M</div><div class="stat-sub up">Documented YTD</div></div>
+        <div class="stat-card sc-red"><div class="stat-label">Q&amp;A Pending</div><div class="stat-value">5</div><div class="stat-sub alert">Vendors waiting</div></div>
+      </div>
+      <div class="two-col">
+        <div class="col-stack">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>Client RFP Pipeline</div><span class="panel-link" onclick="bNav('b-rfps')">All RFPs →</span></div>
+            <div class="panel-body">
+              <div class="rfp-item" onclick="openProject('meridian-tpa')"><div class="rfp-icon ri-gold">📋</div><div class="rfp-info"><div class="rfp-name">Meridian Manufacturing — TPA Review</div><div class="rfp-meta">3,200 lives · Q&amp;A open · 5 TPAs competing</div></div><div class="rfp-right"><span class="pill pill-pending">Q&A Open</span><div class="rfp-date">Apr 1</div></div></div>
+              <div class="rfp-item" onclick="bNav('b-compare')"><div class="rfp-icon ri-teal">🏭</div><div class="rfp-info"><div class="rfp-name">Meridian Manufacturing — Stop-Loss</div><div class="rfp-meta">3,200 lives · 3 of 5 quotes received</div></div><div class="rfp-right"><span class="pill pill-review">Quotes In</span><div class="rfp-date">Closes Mar 24</div></div></div>
+              <div class="rfp-item" onclick="bNav('b-qa-queue')"><div class="rfp-icon ri-gold">🏢</div><div class="rfp-info"><div class="rfp-name">Hartwell Distribution — TPA + PBM</div><div class="rfp-meta">1,800 lives · Phase 1 · 5 Q&amp;A pending</div></div><div class="rfp-right"><span class="pill pill-due">Q&amp;A Due</span><div class="rfp-date">Closes Mar 26</div></div></div>
+              <div class="rfp-item" onclick="bNav('b-compare');openProject('meridian-tpa')"><div class="rfp-icon ri-gold">📋</div><div class="rfp-info"><div class="rfp-name">Meridian Manufacturing — TPA Review</div><div class="rfp-meta">3,200 lives · Q&amp;A open · 3 of 5 questions answered</div></div><div class="rfp-right"><span class="pill pill-pending">Q&amp;A Open</span><div class="rfp-date">Closes Apr 1</div></div></div>
+              <div class="rfp-item"><div class="rfp-icon ri-green">🏥</div><div class="rfp-info"><div class="rfp-name">Coastal Hospital Group — PBM</div><div class="rfp-meta">5,400 lives · Vendor invitations sent</div></div><div class="rfp-right"><span class="pill pill-active">Active</span><div class="rfp-date">Closes Apr 5</div></div></div>
+              <div class="rfp-item"><div class="rfp-icon ri-purple">🚚</div><div class="rfp-info"><div class="rfp-name">Southeast Logistics — TPA Carve-Out</div><div class="rfp-meta">2,100 lives · Draft — not yet sent</div></div><div class="rfp-right"><span class="pill pill-draft">Draft</span><div class="rfp-date">Launch Mar 18</div></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-red"></span>Q&amp;A Queue — Answer Required</div><span class="panel-link" onclick="bNav('b-qa-queue')">Answer All →</span></div>
+            <div class="panel-body">
+              <div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Does the plan include a laser on any current members?</div><div class="task-ctx">Hartwell Distribution · Stop-Loss · Post publicly or reply privately</div></div><div class="task-pri pri-high">High</div></div>
+              <div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">What is the current PBM rebate guarantee percentage?</div><div class="task-ctx">Hartwell Distribution · PBM · Post publicly</div></div><div class="task-pri pri-high">High</div></div>
+              <div class="task-item"><div class="task-check"></div><div class="task-info"><div class="task-title">Is the specific deductible negotiable below $75K?</div><div class="task-ctx">Meridian Manufacturing · Stop-Loss · Reply privately</div></div><div class="task-pri pri-med">Med</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-stack">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Messages</div><span class="panel-link" onclick="bNav('b-messages')">Inbox →</span></div>
+            <div class="panel-body">
+              <div class="msg-item unread"><div class="msg-avatar ma-a">JD</div><div class="msg-info"><div class="msg-from unread">James Devlin (Capital Rx)</div><div class="msg-preview">Rebate guarantee applies to specialty drugs...</div><div class="msg-project">Meridian Mfg RFP</div></div><div class="msg-right"><div class="msg-time">1h ago</div><div class="unread-dot"></div></div></div>
+              <div class="msg-item unread"><div class="msg-avatar ma-d">KP</div><div class="msg-info"><div class="msg-from unread">Karen Park (Meridian)</div><div class="msg-preview">Reviewed stop-loss quotes — Tokio looks best...</div><div class="msg-project">Meridian Mfg RFP</div></div><div class="msg-right"><div class="msg-time">3h ago</div><div class="unread-dot"></div></div></div>
+              <div class="msg-item"><div class="msg-avatar ma-b">TM</div><div class="msg-info"><div class="msg-from">Tokio Marine Underwriting</div><div class="msg-preview">Submitted — please review our specific deductible...</div><div class="msg-project">Meridian Stop-Loss RFP</div></div><div class="msg-right"><div class="msg-time">4h ago</div></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>Master Calendar — All Clients</div><span class="panel-link" onclick="bNav('b-calendar')">Full View →</span></div>
+            <div class="panel-body">
+              <div class="cal-item cal-urgent"><div class="cal-date"><div class="cal-day">16</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Q&amp;A Deadline — Hartwell RFP</div><div class="cal-sub">5 questions pending your response</div></div><div class="cal-tag tag-urgent">1 Day</div></div>
+              <div class="cal-item cal-soon"><div class="cal-date"><div class="cal-day">18</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Launch — SE Logistics TPA RFP</div><div class="cal-sub">Draft ready · 4 vendors to invite</div></div><div class="cal-tag tag-warn">3 Days</div></div>
+              <div class="cal-item cal-soon"><div class="cal-date"><div class="cal-day">24</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">RFP Closes — Meridian Stop-Loss</div><div class="cal-sub">Present comparison to Karen Park</div></div><div class="cal-tag tag-warn">9 Days</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROKER Q&A QUEUE -->
+    <div id="b-qa-queue" class="content animate hidden">
+      <div class="section-h">Q&amp;A Queue — Respond to Vendor Questions</div>
+      <div class="two-col">
+        <div>
+          <div class="qa-item">
+            <div class="qa-q">1. Does the plan include a laser on any current members?</div>
+            <div class="qa-meta"><span class="pill pill-pending">Awaiting Response</span><span>Hartwell Distribution · Stop-Loss</span><span style="color:var(--red)">Pending 2 days</span></div>
+            <div class="qa-actions">
+              <textarea class="form-input" style="height:70px;margin-bottom:8px;display:block;width:100%" placeholder="Type your answer..."></textarea>
+              <button class="qa-btn qa-btn-pub" onclick="answerQ(this,'public')">Answer Publicly — All Vendors</button>
+              <button class="qa-btn qa-btn-priv" onclick="answerQ(this,'private')">Reply Privately Only</button>
+            </div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q">2. What is the current PBM rebate guarantee from the incumbent?</div>
+            <div class="qa-meta"><span class="pill pill-pending">Awaiting Response</span><span>Hartwell Distribution · PBM</span><span style="color:var(--amber)">Pending 1 day</span></div>
+            <div class="qa-actions">
+              <textarea class="form-input" style="height:70px;margin-bottom:8px;display:block;width:100%" placeholder="Type your answer..."></textarea>
+              <button class="qa-btn qa-btn-pub" onclick="answerQ(this,'public')">Answer Publicly — All Vendors</button>
+              <button class="qa-btn qa-btn-priv" onclick="answerQ(this,'private')">Reply Privately Only</button>
+            </div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q">3. Is the specific deductible negotiable below $75,000?</div>
+            <div class="qa-meta"><span class="pill pill-pending">Awaiting Response</span><span>Meridian Manufacturing · Stop-Loss</span><span style="color:var(--slate5)">Pending today</span></div>
+            <div class="qa-actions">
+              <textarea class="form-input" style="height:70px;margin-bottom:8px;display:block;width:100%" placeholder="Type your answer..."></textarea>
+              <button class="qa-btn qa-btn-pub" onclick="answerQ(this,'public')">Answer Publicly</button>
+              <button class="qa-btn qa-btn-priv" onclick="answerQ(this,'private')">Reply Privately Only</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="panel"><div class="panel-header"><div class="panel-title">💡 Routing Guide</div></div><div class="panel-body" style="padding:16px"><div style="font-size:12px;color:var(--slate6);line-height:1.8"><div style="margin-bottom:10px"><strong style="color:var(--teal)">Post Publicly</strong> — use when the answer affects all vendors equally (plan design details, census clarifications, timeline changes). All vendors are notified simultaneously. The original questioner's identity is hidden.</div><div><strong style="color:var(--slate7)">Reply Privately</strong> — use when the question is vendor-specific (e.g. "can you negotiate your fee") and the answer would give one vendor an unfair advantage if shared.</div></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROKER COMPARE -->
+    <div id="b-compare" class="content animate hidden">
+      <div class="section-h">Quote Comparison — Meridian Manufacturing Stop-Loss</div>
+      <div class="panel" style="margin-bottom:14px">
+        <div class="panel-header"><div class="panel-title">⚖️ Weighting Sliders — Adjust to Match Employer Priorities</div></div>
+        <div class="panel-body" style="padding:16px">
+          <div class="weight-row"><div class="weight-lbl">Cost / Premium</div><input type="range" class="weight-slider" min="0" max="100" value="35" oninput="this.nextElementSibling.textContent=this.value+'%'"><div class="weight-val">35%</div></div>
+          <div class="weight-row"><div class="weight-lbl">Laser / Rate Cap Terms</div><input type="range" class="weight-slider" min="0" max="100" value="25" oninput="this.nextElementSibling.textContent=this.value+'%'"><div class="weight-val">25%</div></div>
+          <div class="weight-row"><div class="weight-lbl">Service &amp; Responsiveness</div><input type="range" class="weight-slider" min="0" max="100" value="20" oninput="this.nextElementSibling.textContent=this.value+'%'"><div class="weight-val">20%</div></div>
+          <div class="weight-row"><div class="weight-lbl">Financial Strength</div><input type="range" class="weight-slider" min="0" max="100" value="20" oninput="this.nextElementSibling.textContent=this.value+'%'"><div class="weight-val">20%</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span class="pdot pdot-green"></span>Side-by-Side Comparison — 3 of 5 Quotes Received</div><button class="top-btn btn-primary" style="font-size:11px;padding:5px 12px">Generate PDF Report</button></div>
+        <div class="panel-body" style="padding:0;overflow-x:auto">
+          <table class="compare-table">
+            <thead><tr><th style="width:200px">Criteria</th><th>☀️ Sun Life</th><th>🏔 HM Life</th><th style="background:var(--green)">🏆 Tokio Marine</th><th>⏳ Pending</th><th>⏳ Pending</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:700;color:var(--slate6)">Composite Score</td><td><div class="score-ring"><div class="score-circle sc-good">82</div></div></td><td><div class="score-ring"><div class="score-circle sc-fair">76</div></div></td><td class="best"><div class="score-ring"><div class="score-circle sc-excellent">91</div></div></td><td style="color:var(--slate3)">—</td><td style="color:var(--slate3)">—</td></tr>
+              <tr><td style="font-weight:700;color:var(--slate6)">Specific Deductible</td><td>$75,000</td><td>$80,000</td><td class="best">$75,000</td><td style="color:var(--slate3)">—</td><td style="color:var(--slate3)">—</td></tr>
+              <tr><td style="font-weight:700;color:var(--slate6)">Annual Premium PMPM</td><td>$178.50</td><td>$172.00</td><td class="best">$168.40</td><td style="color:var(--slate3)">—</td><td style="color:var(--slate3)">—</td></tr>
+              <tr class="winner"><td style="font-weight:700;color:var(--slate6)">New Lasers</td><td>2 lasers</td><td>3 lasers</td><td class="best">No new lasers</td><td style="color:var(--slate3)">—</td><td style="color:var(--slate3)">—</td></tr>
+              <tr><td style="font-weight:700;color:var(--slate6)">Rate Cap (Renewal)</td><td>20%</td><td>No cap</td><td class="best">15% cap</td><td style="color:var(--slate3)">—</td><td style="color:var(--slate3)">—</td></tr>
+              <tr><td style="font-weight:700;color:var(--slate6)">AM Best Rating</td><td>A+</td><td>A</td><td class="best">A++</td><td style="color:var(--slate3)">—</td><td style="color:var(--slate3)">—</td></tr>
+              <tr><td style="font-weight:700;color:var(--slate6)">Recommendation</td><td>—</td><td>—</td><td><button class="top-btn btn-green" style="font-size:11px;padding:5px 10px" onclick="awardVendor()">Award This Vendor</button></td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROKER MESSAGES -->
+    <div id="b-messages" class="content animate hidden"><div class="section-h">Inbox — All Messages</div><div class="panel"><div class="panel-body"><div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="msg-avatar ma-a">JD</div><div class="msg-info"><div class="msg-from unread">James Devlin <span style="font-size:10px;color:var(--purple);background:var(--purple-bg);padding:1px 6px;border-radius:4px">Vendor</span></div><div class="msg-preview" style="white-space:normal;margin-top:4px;line-height:1.5">Hi Sarah — yes, our rebate guarantee applies to all brand medications including specialty and GLP-1s. I'll include our GLP-1 management program details in the formal quote. Are you also looking for a 12-month rate guarantee on PEPM?</div><div class="msg-project" style="margin-top:4px">📋 Meridian Mfg PBM RFP</div></div><div class="msg-right"><div class="msg-time">1h ago</div><div class="unread-dot"></div></div></div><div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="msg-avatar ma-d">KP</div><div class="msg-info"><div class="msg-from unread">Karen Park <span style="font-size:10px;color:var(--green);background:var(--green-bg);padding:1px 6px;border-radius:4px">Client</span></div><div class="msg-preview" style="white-space:normal;margin-top:4px;line-height:1.5">Sarah — I reviewed the stop-loss quotes and Tokio Marine looks best based on the no-laser provision and the 15% rate cap. Can we set up a call to discuss before we make a final decision?</div><div class="msg-project" style="margin-top:4px">📋 Meridian Stop-Loss RFP</div></div><div class="msg-right"><div class="msg-time">3h ago</div><div class="unread-dot"></div></div></div></div></div></div>
+
+    <!-- BROKER RFPS -->
+    <div id="b-rfps" class="content animate hidden"><div class="section-h">All Active RFPs</div><div class="panel"><div class="panel-body" style="padding:0"><table class="data-table"><thead><tr><th>Client</th><th>Component</th><th>Lives</th><th>Phase</th><th>Vendors</th><th>Q&amp;A</th><th>Closes</th><th>Action</th></tr></thead><tbody><tr onclick="bNav('b-compare')"><td><strong>Meridian Mfg</strong></td><td><span class="pill pill-pending">Stop-Loss</span></td><td>3,200</td><td><span class="pill pill-review">Quotes In</span></td><td>3/5</td><td>0</td><td style="color:var(--amber)">Mar 24</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Compare</button></td></tr><tr onclick="bNav('b-qa-queue')"><td><strong>Hartwell Dist.</strong></td><td><span class="pill pill-active">TPA + PBM</span></td><td>1,800</td><td><span class="pill pill-pending">Q&amp;A Open</span></td><td>5/6</td><td style="color:var(--red);font-weight:700">5</td><td style="color:var(--amber)">Mar 26</td><td><button class="top-btn btn-red" style="font-size:11px;padding:4px 10px;color:white">Answer Q&amp;A</button></td></tr><tr><td><strong>Coastal Hospital</strong></td><td><span class="pill pill-active">PBM</span></td><td>5,400</td><td><span class="pill pill-active">Active</span></td><td>6/8</td><td>2</td><td>Apr 5</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr><tr><td><strong>SE Logistics</strong></td><td><span class="pill pill-draft">TPA</span></td><td>2,100</td><td><span class="pill pill-draft">Draft</span></td><td>0</td><td>0</td><td>—</td><td><button class="top-btn btn-gold" style="font-size:11px;padding:4px 10px">Launch</button></td></tr></tbody></table></div></div></div>
+
+    <!-- BROKER CLIENTS -->
+    <div id="b-clients" class="content animate hidden"><div class="section-h">My Clients</div><div class="panel"><div class="panel-body" style="padding:0"><table class="data-table"><thead><tr><th>Client</th><th>Lives</th><th>Plan Health Score</th><th>Active RFPs</th><th>Renewal</th><th>Action</th></tr></thead><tbody><tr><td><strong>Meridian Manufacturing</strong></td><td>3,200</td><td><span style="color:var(--green2);font-weight:700">74/100 ↑</span></td><td>1</td><td style="color:var(--amber)">Jan 1, 2027</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr><tr><td><strong>Hartwell Distribution</strong></td><td>1,800</td><td><span style="color:var(--amber);font-weight:700">61/100</span></td><td>1</td><td style="color:var(--amber)">Jul 1, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr><tr><td><strong>Coastal Hospital Group</strong></td><td>5,400</td><td><span style="color:var(--slate5)">—</span></td><td>1</td><td>Jan 1, 2027</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr><tr><td><strong>Southeast Logistics</strong></td><td>2,100</td><td><span style="color:var(--slate5)">—</span></td><td>0</td><td>Jul 1, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr></tbody></table></div></div></div>
+
+    <div id="b-calendar" class="content animate hidden"><div class="section-h">Master Calendar — All Clients</div><div class="panel"><div class="panel-body"><div class="cal-item cal-urgent" style="padding:12px"><div class="cal-date"><div class="cal-day">16</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Q&amp;A Deadline — Hartwell Distribution RFP</div><div class="cal-sub">5 questions pending your response</div></div><div class="cal-tag tag-urgent">1 Day</div></div><div class="cal-item cal-soon" style="padding:12px"><div class="cal-date"><div class="cal-day">18</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">Launch RFP — Southeast Logistics TPA</div><div class="cal-sub">Draft complete · 4 vendors to invite</div></div><div class="cal-tag tag-warn">3 Days</div></div><div class="cal-item cal-soon" style="padding:12px"><div class="cal-date"><div class="cal-day">24</div><div class="cal-month">Mar</div></div><div class="cal-info"><div class="cal-title">RFP Closes — Meridian Manufacturing Stop-Loss</div><div class="cal-sub">Present comparison to Karen Park (CEO)</div></div><div class="cal-tag tag-warn">9 Days</div></div><div class="cal-item cal-ok" style="padding:12px"><div class="cal-date"><div class="cal-day">5</div><div class="cal-month">Apr</div></div><div class="cal-info"><div class="cal-title">RFP Closes — Coastal Hospital Group PBM</div><div class="cal-sub">5,400 lives · 6 vendors invited</div></div><div class="cal-tag tag-info">21 Days</div></div></div></div></div>
+    <div id="b-tasks" class="content animate hidden"><div class="section-h">Tasks — All Clients</div><div class="panel"><div class="panel-body"><div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Answer 5 Q&amp;A questions — Hartwell Distribution</div><div class="task-ctx">Due today — vendors are waiting</div></div><div class="task-pri pri-high">High</div></div><div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Launch Southeast Logistics TPA RFP</div><div class="task-ctx">Planned for Mar 18 · Draft ready</div></div><div class="task-pri pri-med">Med</div></div><div class="task-item" style="padding:12px;border-bottom:1px solid var(--slate1)"><div class="task-check"></div><div class="task-info"><div class="task-title">Schedule call with Karen Park — stop-loss comparison</div><div class="task-ctx">Meridian Mfg · Before Mar 24</div></div><div class="task-pri pri-med">Med</div></div><div class="task-item" style="padding:12px"><div class="task-check done">✓</div><div class="task-info"><div class="task-title done">Generate PBM savings report — Meridian</div><div class="task-ctx">Completed Mar 12 · $1.24M documented</div></div></div></div></div></div>
+  </div>
+</div>
+
+<!-- NEW RFP MODAL -->
+<div id="rfp-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚀 Create New RFP</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <!-- Wizard steps -->
+    <div class="wizard-steps" style="margin-bottom:20px">
+      <div class="wstep active" id="ws1"><div class="wstep-num">1</div><div class="wstep-label">Employer</div><div class="wstep-line"></div></div>
+      <div class="wstep" id="ws2"><div class="wstep-num">2</div><div class="wstep-label">Component</div><div class="wstep-line"></div></div>
+      <div class="wstep" id="ws3"><div class="wstep-num">3</div><div class="wstep-label">Timeline</div><div class="wstep-line"></div></div>
+      <div class="wstep" id="ws4"><div class="wstep-num">4</div><div class="wstep-label">Launch</div></div>
+    </div>
+    <div id="wizard-step-1">
+      <div class="form-group"><label class="form-label">Select Client</label><select class="form-select"><option>Meridian Manufacturing (3,200 lives)</option><option>Hartwell Distribution (1,800 lives)</option><option>Coastal Hospital Group (5,400 lives)</option><option>Southeast Logistics (2,100 lives)</option></select></div>
+      <div class="form-group"><label class="form-label">RFP Name</label><input class="form-input" placeholder="e.g. Stop-Loss Renewal 2027"></div>
+    </div>
+    <div id="wizard-step-2" class="hidden">
+      <div class="form-group"><label class="form-label">Component Type</label><div class="chip-group"><div class="chip selected" onclick="toggleChip(this)">PBM</div><div class="chip" onclick="toggleChip(this)">TPA</div><div class="chip" onclick="toggleChip(this)">Stop-Loss</div><div class="chip" onclick="toggleChip(this)">Network</div></div></div>
+      <div class="form-group"><label class="form-label">Upload Census File</label><input type="file" style="font-size:13px;color:var(--slate6)"></div>
+    </div>
+    <div id="wizard-step-3" class="hidden">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Q&amp;A Opens</label><input type="date" class="form-input" value="2026-03-18"></div>
+        <div class="form-group"><label class="form-label">Q&amp;A Closes</label><input type="date" class="form-input" value="2026-03-25"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Quote Deadline</label><input type="date" class="form-input" value="2026-04-01"></div>
+        <div class="form-group"><label class="form-label">Plan Year Start</label><input type="date" class="form-input" value="2027-01-01"></div>
+      </div>
+    </div>
+    <div id="wizard-step-4" class="hidden">
+      <div class="alert-banner alert-success" style="margin-bottom:12px">✅ Ready to launch! Platform will automatically match and invite qualified vendors.</div>
+      <div style="font-size:12px;color:var(--slate6);line-height:1.8"><div>📌 <strong>Client:</strong> Meridian Manufacturing</div><div>📌 <strong>Component:</strong> PBM</div><div>📌 <strong>Quote Deadline:</strong> Apr 1, 2026</div><div>📌 <strong>Estimated Vendors to Invite:</strong> 5 PBMs matched</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="top-btn btn-ghost" id="wiz-back" onclick="wizBack()" style="display:none">← Back</button>
+      <button class="top-btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="top-btn btn-gold" id="wiz-next" onclick="wizNext()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transform:translateY(100px);transition:transform 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.3)"></div>
+
+<script>
+let currentRole = 'vendor';
+let currentProjectId = null;
+let wizardStep = 1;
+
+function selectRole(role, el) {
+  currentRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const emails = {vendor:'james@capitalrx.com', client:'karen@meridianmfg.com', broker:'sarah@acrisure.com'};
+  document.getElementById('login-email').value = emails[role];
+}
+
+function doLogin() {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+  const appId = currentRole + '-app';
+  const app = document.getElementById(appId);
+  if (app) { app.style.display = 'flex'; app.classList.add('active'); }
+}
+
+function logout() {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-screen').classList.add('active');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+  const s = document.getElementById(id);
+  if (s) { s.style.display = 'flex'; s.classList.add('active'); }
+}
+
+function vNav(pageId, el) {
+  document.querySelectorAll('#vendor-app .content').forEach(c => c.classList.add('hidden'));
+  const page = document.getElementById(pageId);
+  if (page) { page.classList.remove('hidden'); }
+  if (el) {
+    document.querySelectorAll('#vendor-app .nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+}
+
+function cNav(pageId, el) {
+  document.querySelectorAll('#client-app .content').forEach(c => c.classList.add('hidden'));
+  const page = document.getElementById(pageId);
+  if (page) { page.classList.remove('hidden'); }
+  if (el) {
+    document.querySelectorAll('#client-app .nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+}
+
+function bNav(pageId, el) {
+  document.querySelectorAll('#broker-app .content').forEach(c => c.classList.add('hidden'));
+  const page = document.getElementById(pageId);
+  if (page) { page.classList.remove('hidden'); }
+  if (el) {
+    document.querySelectorAll('#broker-app .nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+}
+
+function openProject(id) {
+  currentProjectId = id;
+  const titles = {
+    'meridian-pbm':'Meridian Manufacturing — PBM RFP',
+    'hartwell-pbm':'Hartwell Distribution — PBM Renewal',
+    'meridian-tpa':'Meridian Manufacturing — TPA Review 2027'
+  };
+  document.getElementById('proj-title').textContent = titles[id] || 'Project Detail';
+
+  // Role-aware subtitle
+  const subtitles = {
+    'meridian-tpa': {
+      vendor: '3,200 lives · Broker: Sarah Chen, Acrisure · Quote Due Apr 1',
+      broker: '3,200 lives · 5 TPAs invited · 2 quotes submitted · Q&A open',
+      admin:  '3,200 lives · Admin View · All bids visible · Q&A Phase'
+    }
+  };
+  const sub = subtitles[id] && subtitles[id][currentRole] ? subtitles[id][currentRole] : '3,200 lives · Broker: Sarah Chen, Acrisure · Quote Due Apr 1';
+  const subEl = document.querySelector('#project-detail .topbar-left p');
+  if (subEl) subEl.textContent = sub;
+
+  // Render correct right panel button
+  const rightBtnEl = document.querySelector('#project-detail .topbar-right');
+  if (rightBtnEl && id === 'meridian-tpa') {
+    if (currentRole === 'admin') {
+      rightBtnEl.innerHTML = '<span class="pill pill-pending" style="padding:6px 12px;font-size:11px">Q&A Open · Closes Apr 1</span><button class="top-btn btn-primary" onclick="projTab(\"tab-tpa-bids\")">View All Bids →</button>';
+    } else if (currentRole === 'broker') {
+      rightBtnEl.innerHTML = '<span class="pill pill-pending" style="padding:6px 12px;font-size:11px">Q&A Open</span><button class="top-btn btn-gold" onclick="projTab(\"tab-qa\")">Answer Q&A (3 pending)</button>';
+    } else {
+      rightBtnEl.innerHTML = '<span class="pill pill-pending" style="padding:6px 12px;font-size:11px">Q&A Open · Due Apr 1</span><button class="top-btn btn-primary" onclick="projTab(\"tab-quotes\")">Submit My Quote</button>';
+    }
+  }
+
+  // Render role-specific tabs
+  renderProjectTabs(id);
+  showScreen('project-detail');
+  projTab('tab-overview');
+}
+
+function renderProjectTabs(id) {
+  const tabBar = document.querySelector('#project-detail .tab-bar');
+  if (!tabBar) return;
+  if (id === 'meridian-tpa') {
+    if (currentRole === 'admin') {
+      tabBar.innerHTML = `
+        <div class="tab active" id="tb-overview" onclick="projTab('tab-overview',this)">Overview</div>
+        <div class="tab" id="tb-docs" onclick="projTab('tab-docs',this)">Documents</div>
+        <div class="tab" id="tb-tpa-bids" onclick="projTab('tab-tpa-bids',this)">🏆 All Bids (5 TPAs)</div>
+        <div class="tab" id="tb-qa" onclick="projTab('tab-qa',this)">Q&A Board (5)</div>
+        <div class="tab" id="tb-messages" onclick="projTab('tab-messages',this)">Messages (4)</div>
+      `;
+    } else if (currentRole === 'broker') {
+      tabBar.innerHTML = `
+        <div class="tab active" id="tb-overview" onclick="projTab('tab-overview',this)">Overview</div>
+        <div class="tab" id="tb-docs" onclick="projTab('tab-docs',this)">Documents</div>
+        <div class="tab" id="tb-tpa-bids" onclick="projTab('tab-tpa-bids',this)">Vendor Responses</div>
+        <div class="tab" id="tb-qa" onclick="projTab('tab-qa',this)">Q&A Queue (3 pending)</div>
+        <div class="tab" id="tb-messages" onclick="projTab('tab-messages',this)">Messages (4)</div>
+      `;
+    } else {
+      tabBar.innerHTML = `
+        <div class="tab active" id="tb-overview" onclick="projTab('tab-overview',this)">Overview</div>
+        <div class="tab" id="tb-docs" onclick="projTab('tab-docs',this)">Documents</div>
+        <div class="tab" id="tb-vendors" onclick="projTab('tab-vendors',this)">Vendors (Blind)</div>
+        <div class="tab" id="tb-qa" onclick="projTab('tab-qa',this)">Q&A Board (5)</div>
+        <div class="tab" id="tb-quotes" onclick="projTab('tab-quotes',this)">Submit Quote</div>
+        <div class="tab" id="tb-messages" onclick="projTab('tab-messages',this)">Messages (2)</div>
+      `;
+    }
+  } else {
+    tabBar.innerHTML = `
+      <div class="tab active" id="tb-overview" onclick="projTab('tab-overview',this)">Overview</div>
+      <div class="tab" id="tb-docs" onclick="projTab('tab-docs',this)">Documents</div>
+      <div class="tab" id="tb-vendors" onclick="projTab('tab-vendors',this)">Vendors (5)</div>
+      <div class="tab" id="tb-qa" onclick="projTab('tab-qa',this)">Q&A Board (4)</div>
+      <div class="tab" id="tb-quotes" onclick="projTab('tab-quotes',this)">Submit Quote</div>
+      <div class="tab" id="tb-messages" onclick="projTab('tab-messages',this)">Messages (3)</div>
+    `;
+  }
+}
+
+function closeProject() {
+  const appId = currentRole + '-app';
+  showScreen(appId);
+}
+
+function projTab(tabId, el) {
+  document.querySelectorAll('#project-detail .tab-content').forEach(t => t.classList.add('hidden'));
+  // For TPA project, render the right content dynamically
+  if (currentProjectId === 'meridian-tpa') {
+    renderTPATab(tabId);
+    return;
+  }
+  const tab = document.getElementById(tabId);
+  if (tab) tab.classList.remove('hidden');
+  document.querySelectorAll('#project-detail .tab').forEach(t => t.classList.remove('active'));
+  const tabMap = {'tab-overview':'tb-overview','tab-docs':'tb-docs','tab-vendors':'tb-vendors','tab-qa':'tb-qa','tab-quotes':'tb-quotes','tab-messages':'tb-messages'};
+  const tbEl = document.getElementById(tabMap[tabId]);
+  if (tbEl) tbEl.classList.add('active');
+}
+
+
+function renderTPATab(tabId) {
+  // Find or create the dynamic content area
+  let dynArea = document.getElementById('tpa-dynamic-content');
+  if (!dynArea) {
+    // Hide all existing tab-content divs
+    document.querySelectorAll('#project-detail .tab-content').forEach(t => t.classList.add('hidden'));
+    dynArea = document.createElement('div');
+    dynArea.id = 'tpa-dynamic-content';
+    dynArea.className = 'content animate';
+    // Insert after the tab-bar
+    const tabBar = document.querySelector('#project-detail .tab-bar');
+    tabBar.parentNode.insertBefore(dynArea, tabBar.nextSibling);
+  }
+  dynArea.style.display = 'block';
+  // Hide all old tab-content
+  document.querySelectorAll('#project-detail .tab-content').forEach(t => t.classList.add('hidden'));
+  // Set active tab
+  document.querySelectorAll('#project-detail .tab').forEach(t => t.classList.remove('active'));
+  const tabIdMap = {'tab-overview':'tb-overview','tab-docs':'tb-docs','tab-tpa-bids':'tb-tpa-bids','tab-qa':'tb-qa','tab-quotes':'tb-quotes','tab-vendors':'tb-vendors','tab-messages':'tb-messages'};
+  const activeTab = document.getElementById(tabIdMap[tabId]);
+  if (activeTab) activeTab.classList.add('active');
+
+  if (tabId === 'tab-overview') { dynArea.innerHTML = tpaOverview(); return; }
+  if (tabId === 'tab-tpa-bids') { dynArea.innerHTML = tpaBids(); return; }
+  if (tabId === 'tab-qa') { dynArea.innerHTML = tpaQA(); return; }
+  if (tabId === 'tab-quotes') { dynArea.innerHTML = tpaQuoteSubmit(); return; }
+  if (tabId === 'tab-vendors') { dynArea.innerHTML = tpaVendorBlind(); return; }
+  if (tabId === 'tab-docs') { dynArea.innerHTML = tpaDocs(); return; }
+  if (tabId === 'tab-messages') { dynArea.innerHTML = tpaMessages(); return; }
+  dynArea.innerHTML = '<div style="padding:20px;color:var(--slate5)">Coming soon</div>';
+}
+
+// ── TPA OVERVIEW ─────────────────────────────────────────────────────────────
+function tpaOverview() {
+  const isAdmin = currentRole === 'admin';
+  const isBroker = currentRole === 'broker';
+  const isVendor = currentRole === 'vendor';
+  return \`
+  <div class="two-col">
+    <div class="col-stack">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>RFP Details</div></div>
+        <div class="panel-body" style="padding:16px">
+          <table style="width:100%;border-collapse:collapse">
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);width:140px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Employer</td><td style="font-size:13px;font-weight:600;color:var(--slate9)">Meridian Manufacturing</td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Component</td><td><span class="pill pill-pending">TPA</span></td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Covered Lives</td><td style="font-size:13px;font-weight:600;color:var(--slate9)">3,200</td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Plan Year</td><td style="font-size:13px;color:var(--slate9)">Jan 1 – Dec 31, 2027</td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Incumbent</td><td style="font-size:13px;color:var(--slate9)">Trustmark Health Benefits</td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Broker</td><td style="font-size:13px;color:var(--slate9)">Sarah Chen, Acrisure</td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Q&A Closes</td><td style="font-size:13px;color:var(--amber);font-weight:700">Mar 28 (13 days)</td></tr>
+            <tr><td style="padding:5px 0;font-size:11px;color:var(--slate4);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Quote Deadline</td><td style="font-size:13px;color:var(--slate9)">Apr 1, 2026</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span class="pdot pdot-teal"></span>Why We're Going to Market</div></div>
+        <div class="panel-body" style="padding:16px;font-size:13px;color:var(--slate7);line-height:1.7">
+          Meridian's Trustmark contract expires Dec 31, 2026. Current admin fee is $32 PEPM — broker benchmark suggests market is $24–28 PEPM for a group this size. No competitive bid has been run in 4 years. Goal is to document savings, retain or replace Trustmark, and unlock network carve-out flexibility.
+        </div>
+      </div>
+    </div>
+    <div class="col-stack">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span class="pdot pdot-\${isAdmin?'red':'gold'}"></span>\${isAdmin ? '⚙️ Admin — Full Bid Status' : isBroker ? '📊 Bid Status' : '📋 Your RFP Status'}</div></div>
+        <div class="panel-body" style="padding:14px">
+          \${isAdmin ? \`
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate4);margin-bottom:10px">5 TPAs Invited — Admin View</div>
+            \${[
+              {name:'Trustmark Health Benefits',status:'Quoted',color:'green',note:'Incumbent — $29.50 PEPM'},
+              {name:'Nova Healthcare Admins',status:'Quoted',color:'green',note:'$26.80 PEPM ← Lowest'},
+              {name:'Meritain Health (Aetna)',status:'Q&A Active',color:'amber',note:'2 questions pending'},
+              {name:'HealthSmart Benefits',status:'Invited',color:'slate',note:'Accepted — no quote yet'},
+              {name:'Allied Benefit Systems',status:'Invited',color:'slate',note:'Accepted — no quote yet'},
+            ].map((v,i) => \`
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--slate1)">
+                <div style="width:28px;height:28px;border-radius:6px;background:var(--slate1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--slate5)">\${i+1}</div>
+                <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--slate9)">\${v.name}</div><div style="font-size:10.5px;color:var(--slate5)">\${v.note}</div></div>
+                <span class="pill \${v.status==='Quoted'?'pill-awarded':v.status==='Q&A Active'?'pill-pending':'pill-draft'}">\${v.status}</span>
+              </div>
+            \`).join('')}
+            <div style="margin-top:10px">
+              <button class="top-btn btn-primary" style="width:100%;font-size:12px" onclick="renderTPATab('tab-tpa-bids')">View Full Bid Comparison →</button>
+            </div>
+          \` : isBroker ? \`
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate4);margin-bottom:10px">Vendor Engagement Status</div>
+            \${[
+              {name:'Vendor A',status:'Quote Submitted',color:'green'},
+              {name:'Vendor B',status:'Quote Submitted',color:'green'},
+              {name:'Vendor C',status:'Q&A Active',color:'amber'},
+              {name:'Vendor D',status:'Accepted',color:'slate'},
+              {name:'Vendor E',status:'Accepted',color:'slate'},
+            ].map((v,i) => \`
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--slate1)">
+                <div style="width:28px;height:28px;border-radius:6px;background:var(--slate1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--slate5)">#\${i+1}</div>
+                <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--slate9)">\${v.name}</div></div>
+                <span class="pill \${v.status==='Quote Submitted'?'pill-awarded':v.status==='Q&A Active'?'pill-pending':'pill-draft'}">\${v.status}</span>
+              </div>
+            \`).join('')}
+            <div style="margin-top:10px;font-size:11px;color:var(--slate4);padding:8px;background:var(--teal-bg);border-radius:6px">Vendor identities revealed after Q&A closes Apr 1</div>
+          \` : \`
+            <div style="background:var(--gold-bg);border:1.5px solid rgba(181,130,10,0.2);border-radius:8px;padding:12px;margin-bottom:12px">
+              <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:4px">Q&A Period Open — Your Questions Welcome</div>
+              <div style="font-size:12px;color:var(--slate6)">Submit questions by Mar 28. Quote due Apr 1.</div>
+            </div>
+            <button class="top-btn btn-primary" style="width:100%;margin-bottom:8px" onclick="renderTPATab('tab-qa')">Submit a Question →</button>
+            <button class="top-btn btn-ghost" style="width:100%" onclick="renderTPATab('tab-quotes')">Preview Quote Form</button>
+          \`}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Phase Tracker</div></div>
+        <div class="panel-body" style="padding:12px">
+          \${[
+            {label:'RFP Launched',done:true},
+            {label:'5 Vendors Invited',done:true},
+            {label:'Q&A Period',active:true},
+            {label:'Quote Submission',done:false},
+            {label:'Comparison',done:false},
+            {label:'Award',done:false},
+          ].map(p => \`
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 0">
+              <div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;
+                \${p.done?'background:var(--green);color:white':p.active?'background:var(--amber);color:white':'background:var(--slate2);color:var(--slate4)'}">
+                \${p.done?'✓':p.active?'▶':'○'}
+              </div>
+              <div style="font-size:12px;font-weight:\${p.active?700:500};color:\${p.done?'var(--green)':p.active?'var(--amber)':'var(--slate4)'}">\${p.label}</div>
+              \${p.active?'<span style="margin-left:auto;font-size:10px;background:var(--gold-bg);color:var(--gold);padding:1px 7px;border-radius:10px;font-weight:700">Now</span>':''}
+            </div>
+          \`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>\`;
+}
+
+// ── TPA ALL BIDS (Admin full view + Broker post-deadline view) ─────────────
+function tpaBids() {
+  const isAdmin = currentRole === 'admin';
+  const isBroker = currentRole === 'broker';
+  if (!isAdmin && !isBroker) return '<div style="padding:32px;text-align:center;color:var(--slate4)"><div style="font-size:24px;margin-bottom:10px">🔒</div><div style="font-size:14px;font-weight:700">Not Available</div><div style="font-size:12px;margin-top:6px">Quote comparison is only visible to the broker after the submission deadline.</div></div>';
+
+  const tpas = [
+    {name:'Nova Healthcare Admins',       short:'Nova',  pepm:'$26.80',runout:'$4.20',impl:45,net:'MultiPlan',laser:'None',cap:'None',claim:'98.2%',nps:82,score:91,submitted:true,winner:true},
+    {name:'Trustmark Health Benefits',    short:'Trust', pepm:'$29.50',runout:'$5.00',impl:60,net:'First Health',laser:'$150K (1)',cap:'20%',claim:'96.8%',nps:74,score:81,submitted:true,winner:false},
+    {name:'Meritain Health (Aetna)',      short:'Merit', pepm:'$27.90',runout:'$4.50',impl:45,net:'Aetna',laser:'None',cap:'15%',claim:'97.5%',nps:78,score:85,submitted:false,winner:false},
+    {name:'HealthSmart Benefits',         short:'HSmart',pepm:'—',      runout:'—',   impl:null,net:'PHCS',laser:'—',cap:'—',claim:'—',nps:null,score:null,submitted:false,winner:false},
+    {name:'Allied Benefit Systems',       short:'Allied',pepm:'—',      runout:'—',   impl:null,net:'Various',laser:'—',cap:'—',claim:'—',nps:null,score:null,submitted:false,winner:false},
+  ];
+
+  const adminNote = isAdmin ? \`<div style="background:rgba(192,57,43,0.06);border:1.5px solid rgba(192,57,43,0.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red);font-weight:600">⚙️ Admin View — All vendor names and pricing visible. Broker sees anonymized names until award.</div>\` : \`<div style="background:var(--teal-bg);border:1.5px solid rgba(42,143,163,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--teal2);font-weight:600">📊 Broker View — You can see vendor responses. Vendor names revealed post-deadline. Quotes visible once submitted.</div>\`;
+
+  return \`\${adminNote}
+  <div style="margin-bottom:14px">
+    <div class="section-h">Weighting — Adjust to Match Employer Priorities</div>
+    <div style="background:white;border:1.5px solid var(--slate2);border-radius:10px;padding:14px">
+      \${[['Cost / PEPM','40'],['Network Access','20'],['Service & Tech','25'],['Implementation','15']].map(([l,v])=>\`
+        <div class="weight-row"><div class="weight-lbl">\${l}</div><input type="range" class="weight-slider" min="0" max="100" value="\${v}" oninput="this.nextElementSibling.textContent=this.value+'%'"><div class="weight-val">\${v}%</div></div>
+      \`).join('')}
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>Side-by-Side Comparison — \${isAdmin ? 'All 5 TPA Vendors' : '5 Vendors (2 quotes submitted)'}</div>
+      <button class="top-btn btn-primary" style="font-size:11px;padding:5px 12px">Generate PDF Report</button>
+    </div>
+    <div class="panel-body" style="padding:0;overflow-x:auto">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:180px">Criteria</th>
+            \${tpas.map(t => \`<th style="\${t.winner?'background:var(--green)':''}">\${t.winner?'🏆 ':''}\${isAdmin ? t.name : (t.submitted ? (t.winner?'🏆 Vendor A':'Vendor '+String.fromCharCode(65+tpas.indexOf(t))) : 'Vendor '+String.fromCharCode(65+tpas.indexOf(t)))}</th>\`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="font-weight:700;color:var(--slate6)">Composite Score</td>
+            \${tpas.map(t => t.score ? \`<td\${t.winner?' class="winner"':''}>
+              <div class="score-ring"><div class="score-circle \${t.score>=88?'sc-excellent':t.score>=78?'sc-good':'sc-fair'}">\${t.score}</div></div>
+            </td>\` : '<td style="color:var(--slate3)">Pending</td>').join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Admin Fee PEPM</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}\${t.pepm!=='—'&&t.submitted?' style="font-weight:700"':''}>\${t.submitted?(\`\${t.winner?'<span class="best">'+t.pepm+'</span>':t.pepm}\`):('<span style="color:var(--slate3)">Not submitted</span>')}</td>\`).join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Run-Out Fee PEPM</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}>\${t.submitted?(\`\${t.winner?'<span class="best">'+t.runout+'</span>':t.runout}\`):'<span style="color:var(--slate3)">—</span>'}</td>\`).join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Network Access</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}>\${t.submitted?(\`\${t.winner?'<span class="best">'+t.net+'</span>':t.net}\`):'<span style="color:var(--slate3)">—</span>'}</td>\`).join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Lasers / Exclusions</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}>\${t.submitted?(\`\${t.winner?'<span class="best">'+t.laser+'</span>':t.laser}\`):'<span style="color:var(--slate3)">—</span>'}</td>\`).join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Rate Cap (Renewal)</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}>\${t.submitted?(\`\${t.winner?'<span class="best">'+t.cap+'</span>':t.cap}\`):'<span style="color:var(--slate3)">—</span>'}</td>\`).join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Claims Accuracy</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}>\${t.submitted?(\`\${t.winner?'<span class="best">'+t.claim+'</span>':t.claim}\`):'<span style="color:var(--slate3)">—</span>'}</td>\`).join('')}
+          </tr>
+          <tr><td style="font-weight:700;color:var(--slate6)">Impl. Timeline</td>
+            \${tpas.map(t => \`<td\${t.winner?' class="winner"':''}>\${t.submitted&&t.impl?(\`\${t.winner?'<span class="best">'+t.impl+' days</span>':t.impl+' days'}\`):'<span style="color:var(--slate3)">—</span>'}</td>\`).join('')}
+          </tr>
+          \${isAdmin || isBroker ? \`<tr><td style="font-weight:700;color:var(--slate6)">Action</td>
+            \${tpas.map(t => t.submitted && !t.winner ? \`<td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="toast('Notification sent to \${isAdmin?t.name:'vendor'}')">Notify Result</button></td>\` :
+              t.winner ? '<td class="winner"><button class="top-btn btn-green" style="font-size:11px;padding:5px 10px" onclick="awardTPA()">Award Nova ✓</button></td>' :
+              '<td style="color:var(--slate3);font-size:11px">Awaiting quote</td>').join('')}
+          </tr>\` : ''}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="margin-top:14px;background:var(--green-bg);border:1.5px solid rgba(46,125,85,0.2);border-radius:10px;padding:14px">
+    <div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:6px">💰 Projected Savings if Nova Selected</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--green)">$631K</div><div style="font-size:10px;color:var(--green2);font-weight:700">First-Year Savings</div><div style="font-size:10px;color:var(--slate5);margin-top:2px">vs. current Trustmark rate</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--teal2)">$5.20</div><div style="font-size:10px;color:var(--teal2);font-weight:700">PEPM Reduction</div><div style="font-size:10px;color:var(--slate5);margin-top:2px">$32.00 → $26.80 PEPM</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--gold)">16.3%</div><div style="font-size:10px;color:var(--gold);font-weight:700">Cost Reduction</div><div style="font-size:10px;color:var(--slate5);margin-top:2px">vs. incumbent</div></div>
+    </div>
+  </div>\`;
+}
+
+// ── TPA Q&A BOARD ──────────────────────────────────────────────────────────
+function tpaQA() {
+  const isAdmin = currentRole === 'admin';
+  const isBroker = currentRole === 'broker';
+  const qas = [
+    {q:'Can you confirm whether run-out claims administration is included in the quoted PEPM or billed separately?', who:'Vendor C', public:true, answered:true, ans:'Run-out claims administration is billed separately at the quoted run-out PEPM for a period of 12 months following termination.'},
+    {q:'What is the current PPO network discount rate for the Midwest region specifically?', who:'Vendor A', public:true, answered:true, ans:'The MultiPlan/PHCS network delivers average discounts of 42-48% off billed charges in the Midwest region. Full network access report available on request.'},
+    {q:'Is there flexibility on the 60-day implementation timeline for a Jan 1 effective date?', who:'Vendor B', public:true, answered:false, ans:''},
+    {q:'Does the platform integrate with ADP for payroll and eligibility feeds?', who:'Vendor D', public:true, answered:false, ans:''},
+    {q:'What is the process for member ID card issuance prior to the plan effective date?', who:'Vendor A', public:false, answered:true, ans:'Member ID cards are issued 10-14 business days prior to the effective date. Digital cards available immediately upon enrollment.'},
+  ];
+  return \`
+  <div class="two-col">
+    <div>
+      <div class="section-h">Q&A Board — \${isAdmin ? 'Admin View (all vendors visible)' : isBroker ? 'Broker View — Answer Pending Questions' : 'Public Questions & Answers'}</div>
+      \${qas.map((qa,i) => \`
+        <div class="qa-item" style="margin-bottom:10px">
+          <div class="qa-q">Q\${i+1}. \${qa.q}</div>
+          <div class="qa-meta">
+            \${isAdmin ? \`<span style="font-size:10px;background:rgba(192,57,43,0.1);color:var(--red);padding:1px 7px;border-radius:4px;font-weight:700">⚙️ \${qa.who}</span>\` : \`<span class="pill pill-new">\${qa.public ? 'Public' : 'Private'}</span>\`}
+            <span>\${qa.answered ? 'Answered' : 'Awaiting broker response'}</span>
+            \${!qa.answered ? '<span style="color:var(--red);font-weight:700">⚠ Pending</span>' : ''}
+          </div>
+          \${qa.answered ? \`<div class="qa-answer">A: \${qa.ans}</div>\` : ''}
+          \${(isBroker || isAdmin) && !qa.answered ? \`
+            <div class="qa-actions" style="flex-direction:column;gap:6px">
+              <textarea class="form-input" style="height:70px" placeholder="Type your answer..."></textarea>
+              <div style="display:flex;gap:6px">
+                <button class="qa-btn qa-btn-pub" onclick="answerQ(this,'public')">Post Publicly — All Vendors</button>
+                <button class="qa-btn qa-btn-priv" onclick="answerQ(this,'private')">Reply Privately</button>
+              </div>
+            </div>
+          \` : ''}
+        </div>
+      \`).join('')}
+    </div>
+    <div>
+      <div class="section-h">Submit a Question</div>
+      <div class="panel">
+        <div class="panel-body" style="padding:16px">
+          \${isAdmin ? \`<div style="background:rgba(192,57,43,0.06);border:1.5px solid rgba(192,57,43,0.15);border-radius:8px;padding:10px;font-size:12px;color:var(--red);margin-bottom:12px">⚙️ Admin can view all vendor identities. In broker and vendor views, questioners are anonymized.</div>\` : ''}
+          <div class="form-group">
+            <label class="form-label">Your Question</label>
+            <textarea class="form-input" style="height:90px" placeholder="Type your question here..."></textarea>
+            <div class="form-hint">Questions are reviewed by the broker. Public answers go to all vendors simultaneously. Your identity is not revealed to other vendors.</div>
+          </div>
+          <button class="top-btn btn-primary" style="width:100%" onclick="toast('Question submitted — broker will respond within 24 hours')">Submit Question</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-header"><div class="panel-title">📊 Q&A Stats</div></div>
+        <div class="panel-body" style="padding:12px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            \${[['Total Questions','5'],['Answered','3'],['Pending','2'],['Public','4'],['Private','1'],['Q&A Closes','Mar 28']].map(([l,v])=>\`
+              <div style="background:var(--slate0);border-radius:6px;padding:8px 10px">
+                <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--slate4);margin-bottom:3px">\${l}</div>
+                <div style="font-size:14px;font-weight:800;color:var(--slate9)">\${v}</div>
+              </div>
+            \`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>\`;
+}
+
+// ── TPA QUOTE SUBMIT (vendor view) ─────────────────────────────────────────
+function tpaQuoteSubmit() {
+  return \`
+  <div style="margin-bottom:14px" class="alert-banner alert-warn">⏰ Quote deadline: <strong>Apr 1, 2026 at 11:59 PM</strong> — 17 days remaining. Once submitted, quotes cannot be changed.</div>
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>TPA Quote — Meridian Manufacturing</div></div>
+      <div class="panel-body" style="padding:20px">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Admin Fee PEPM</label><input class="form-input" placeholder="e.g. $26.80 PEPM"></div>
+          <div class="form-group"><label class="form-label">Run-Out Fee PEPM</label><input class="form-input" placeholder="e.g. $4.20 PEPM"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Network Partner</label><select class="form-select"><option>MultiPlan / PHCS</option><option>First Health</option><option>Aetna</option><option>Cigna Open Access</option><option>Other</option></select></div>
+          <div class="form-group"><label class="form-label">Implementation Timeline</label><select class="form-select"><option>30 days</option><option>45 days</option><option>60 days</option><option>90 days</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Renewal Rate Cap</label><input class="form-input" placeholder="e.g. 15% year-over-year cap"></div>
+          <div class="form-group"><label class="form-label">Claims Accuracy Rate</label><input class="form-input" placeholder="e.g. 98.2%"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Proposed Lasers or Exclusions</label><input class="form-input" placeholder="List any lasers or exclusions — or type None"></div>
+        <div class="form-group"><label class="form-label">ADP Integration Available?</label><select class="form-select"><option>Yes — native integration</option><option>Yes — via file feed</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Additional Notes / Value-Adds</label><textarea class="form-input" style="height:80px" placeholder="Any additional programs, reporting capabilities, or commitments to include..."></textarea></div>
+        <div class="form-group"><label class="form-label">Upload Quote Document (PDF)</label><input type="file" style="font-size:13px;color:var(--slate6)"></div>
+        <button class="top-btn btn-primary" style="width:100%;padding:12px;font-size:14px" onclick="toast('✅ TPA quote submitted! Broker Sarah Chen has been notified.')">Submit Quote →</button>
+      </div>
+    </div>
+    <div class="col-stack">
+      <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-gold"></span>What Brokers Evaluate</div></div><div class="panel-body" style="padding:14px"><div style="font-size:12px;color:var(--slate6);line-height:1.9"><div>1️⃣ <strong style="color:var(--slate9)">Admin Fee PEPM</strong> — your cost vs. current $32 PEPM incumbent</div><div>2️⃣ <strong style="color:var(--slate9)">Network Discounts</strong> — what % off billed charges in Midwest</div><div>3️⃣ <strong style="color:var(--slate9)">Lasers & Exclusions</strong> — none preferred</div><div>4️⃣ <strong style="color:var(--slate9)">Implementation Speed</strong> — Jan 1 hard date</div><div>5️⃣ <strong style="color:var(--slate9)">ADP Integration</strong> — employer uses ADP payroll</div><div>6️⃣ <strong style="color:var(--slate9)">Renewal Rate Cap</strong> — cost predictability</div></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>Blind Bid Notice</div></div><div class="panel-body" style="padding:14px"><div style="font-size:12px;color:var(--slate6);line-height:1.7">Your pricing is <strong style="color:var(--slate9)">never shared</strong> with competing TPAs. Other vendors see only a competitiveness percentile after award — not your specific numbers. This protects your bid integrity.</div></div></div>
+    </div>
+  </div>\`;
+}
+
+// ── TPA VENDOR BLIND VIEW ──────────────────────────────────────────────────
+function tpaVendorBlind() {
+  return \`
+  <div class="panel">
+    <div class="panel-header"><div class="panel-title"><span class="pdot pdot-purple"></span>Invited Vendors — Blind Competition</div><div style="font-size:11px;color:var(--slate4)">Vendors cannot see each other's names, bids, or pricing</div></div>
+    <div class="panel-body" style="padding:0">
+      <table class="data-table">
+        <thead><tr><th>Vendor</th><th>Category</th><th>Status</th><th>Quote</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Nova Healthcare Admins (You)</strong></td><td><span class="pill pill-pending">TPA</span></td><td><span class="pill pill-active">Active</span></td><td><span style="color:var(--amber)">Pending — Due Apr 1</span></td></tr>
+          <tr><td>Vendor #2</td><td><span class="pill pill-pending">TPA</span></td><td><span class="pill pill-active">Active</span></td><td><span style="color:var(--green)">✓ Submitted</span></td></tr>
+          <tr><td>Vendor #3</td><td><span class="pill pill-pending">TPA</span></td><td><span class="pill pill-pending">Q&A Active</span></td><td>—</td></tr>
+          <tr><td>Vendor #4</td><td><span class="pill pill-pending">TPA</span></td><td><span class="pill pill-draft">Accepted</span></td><td>—</td></tr>
+          <tr><td>Vendor #5</td><td><span class="pill pill-pending">TPA</span></td><td><span class="pill pill-draft">Accepted</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="margin-top:12px;background:var(--teal-bg);border:1.5px solid rgba(42,143,163,0.15);border-radius:10px;padding:14px;font-size:12px;color:var(--slate6);line-height:1.7">
+    💡 <strong style="color:var(--slate9)">How blind bidding works:</strong> You can see how many other vendors are participating and their general status — but not their names or pricing. After the broker selects a winner, all vendors receive a competitiveness percentile signal (e.g., "Your bid ranked in the 85th percentile") — enough context to improve future bids without exposing anyone's pricing.
+  </div>\`;
+}
+
+// ── TPA DOCS ───────────────────────────────────────────────────────────────
+function tpaDocs() {
+  return \`<div class="panel"><div class="panel-header"><div class="panel-title"><span class="pdot pdot-blue"></span>RFP Documents</div></div><div class="panel-body" style="padding:0">
+    <table class="data-table"><thead><tr><th>Document</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Action</th></tr></thead><tbody>
+      <tr><td>📄 Meridian_TPA_RFP_2027.pdf</td><td>RFP Package</td><td>3.1 MB</td><td>Mar 10, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr>
+      <tr><td>📊 Meridian_Census_3200_Lives.xlsx</td><td>Census</td><td>920 KB</td><td>Mar 10, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr>
+      <tr><td>📈 Claims_History_24mo.pdf</td><td>Claims Data</td><td>1.4 MB</td><td>Mar 10, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr>
+      <tr><td>📋 Trustmark_Current_Contract.pdf</td><td>Incumbent Contract</td><td>780 KB</td><td>Mar 10, 2026</td><td><button class="top-btn btn-ghost" style="font-size:11px;padding:4px 10px">Download</button></td></tr>
+    </tbody></table>
+  </div></div>\`;
+}
+
+// ── TPA MESSAGES ───────────────────────────────────────────────────────────
+function tpaMessages() {
+  return \`<div class="two-col">
+    <div>
+      <div class="section-h">Project Messages</div>
+      <div class="panel"><div class="panel-body">
+        <div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)">
+          <div class="msg-avatar ma-c">SC</div>
+          <div class="msg-info">
+            <div class="msg-from unread">Sarah Chen <span style="font-size:10px;color:var(--teal2);background:var(--teal-bg);padding:1px 6px;border-radius:4px">Broker</span></div>
+            <div class="msg-preview" style="white-space:normal;line-height:1.5;margin-top:4px">Welcome to the Meridian TPA RFP. Please review all documents in the Documents tab. The Q&A period is open through March 28 — we encourage questions before you finalize your quote.</div>
+            <div class="msg-project" style="margin-top:4px">Mar 10, 9:00 AM</div>
+          </div>
+        </div>
+        <div class="msg-item unread" style="padding:12px;border-bottom:1px solid var(--slate1)">
+          <div class="msg-avatar ma-sf">SF</div>
+          <div class="msg-info">
+            <div class="msg-from unread">Self Fund Platform</div>
+            <div class="msg-preview" style="white-space:normal;line-height:1.5;margin-top:4px">Reminder: Q&A closes March 28. Quote submission deadline is April 1. Late submissions will not be accepted.</div>
+            <div class="msg-project" style="margin-top:4px">Mar 15, 8:00 AM</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div>
+      <div class="section-h">Reply to Broker</div>
+      <div class="panel"><div class="panel-body" style="padding:16px">
+        <textarea class="form-input" style="height:120px;margin-bottom:10px" placeholder="Message Sarah Chen..."></textarea>
+        <div style="display:flex;justify-content:flex-end"><button class="top-btn btn-primary">Send Message</button></div>
+      </div></div>
+    </div>
+  </div>\`;
+}
+
+function awardTPA() {
+  toast('🏆 Nova Healthcare Admins awarded! All vendors notified with competitiveness percentile.');
+}
+
+function showNewRFP() {
+  wizardStep = 1;
+  updateWizard();
+  document.getElementById('rfp-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('rfp-modal').classList.remove('open');
+}
+
+function wizNext() {
+  if (wizardStep < 4) {
+    document.getElementById('ws'+wizardStep).classList.add('done');
+    wizardStep++;
+    updateWizard();
+  } else {
+    closeModal();
+    toast('🚀 RFP launched! 5 PBMs have been invited.');
+  }
+}
+
+function wizBack() {
+  if (wizardStep > 1) {
+    document.getElementById('ws'+wizardStep).classList.remove('done','active');
+    wizardStep--;
+    updateWizard();
+  }
+}
+
+function updateWizard() {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('wizard-step-'+i);
+    if (el) el.classList.toggle('hidden', i !== wizardStep);
+    const ws = document.getElementById('ws'+i);
+    if (ws) ws.classList.toggle('active', i === wizardStep);
+  }
+  document.getElementById('wiz-back').style.display = wizardStep > 1 ? 'block' : 'none';
+  document.getElementById('wiz-next').textContent = wizardStep === 4 ? '🚀 Launch RFP' : 'Next →';
+  document.getElementById('wiz-next').className = 'top-btn ' + (wizardStep === 4 ? 'btn-green' : 'btn-gold');
+}
+
+function toggleChip(el) { el.classList.toggle('selected'); }
+
+function acceptInvite(btn, name) {
+  btn.closest('div[style*="border"]').style.borderColor = 'var(--green2)';
+  btn.closest('div[style*="border"]').style.background = 'var(--green-bg)';
+  btn.textContent = '✓ Accepted';
+  btn.className = 'top-btn btn-ghost';
+  btn.disabled = true;
+  toast('✅ You have accepted the ' + name + ' RFP invitation!');
+}
+
+function declineInvite(btn) {
+  btn.closest('div[style*="border"]').style.opacity = '0.5';
+  btn.textContent = 'Declined';
+  btn.disabled = true;
+  toast('Invitation declined.');
+}
+
+function submitQuote() {
+  toast('✅ Quote submitted successfully! The broker has been notified.');
+}
+
+function answerQ(btn, type) {
+  const item = btn.closest('.qa-item');
+  const pill = item.querySelector('.pill');
+  if (type === 'public') {
+    pill.className = 'pill pill-new';
+    pill.textContent = 'Answered Publicly';
+    toast('✅ Answer posted publicly — all vendors notified simultaneously.');
+  } else {
+    pill.className = 'pill pill-active';
+    pill.textContent = 'Answered Privately';
+    toast('✅ Private reply sent to the vendor who asked.');
+  }
+  item.querySelectorAll('.qa-btn').forEach(b => b.disabled = true);
+}
+
+function awardVendor() {
+  toast('🏆 Tokio Marine awarded! Other vendors notified with competitiveness percentile.');
+}
+
+function showPage(id) { vNav(id); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.transform = 'translateY(0)';
+  setTimeout(() => { t.style.transform = 'translateY(100px)'; }, 3500);
+}
+
+// Initialize: hide all screens except login
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.screen').forEach(s => {
+    if (!s.classList.contains('active')) s.style.display = 'none';
+  });
+});
+</script>
+</body>
+</html>
