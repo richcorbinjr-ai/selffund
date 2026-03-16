@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self Fund — Platform Structure Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D2340;--teal:#0891B2;--teal2:#22D3EE;--gold:#C9922A;
+  --green:#059669;--green2:#10B981;--red:#DC2626;--amber:#D97706;
+  --purple:#7C3AED;--blue:#3B82F6;
+  --slate9:#0F172A;--slate8:#1E293B;--slate7:#334155;--slate6:#475569;
+  --slate5:#64748B;--slate4:#94A3B8;--slate3:#CBD5E1;--slate2:#E2E8F0;
+  --slate1:#F1F5F9;--slate0:#F8FAFC;--white:#FFFFFF;
+  --font:'DM Sans',sans-serif;
+}
+body{font-family:var(--font);background:#060D1A;color:var(--white);min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.header{background:var(--navy);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08)}
+.header-logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),#065E7C);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:white}
+.logo-text{font-size:18px;font-weight:900;color:white;letter-spacing:-0.3px}
+.logo-text span{color:var(--teal2)}
+.header-title{font-size:13px;color:rgba(255,255,255,0.4);letter-spacing:0.15em;text-transform:uppercase}
+
+/* MAIN LAYOUT */
+.layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 57px)}
+
+/* LEFT PANEL — TREE */
+.tree-panel{background:#0A1628;border-right:1px solid rgba(255,255,255,0.07);overflow-y:auto;padding:20px 0}
+.tree-section{margin-bottom:4px}
+.tree-section-label{font-size:9px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);padding:10px 20px 6px}
+
+/* CLIENT ROWS */
+.client-row{display:flex;align-items:center;gap:8px;padding:10px 20px;cursor:pointer;transition:all 0.15s;position:relative;user-select:none}
+.client-row:hover{background:rgba(255,255,255,0.04)}
+.client-row.active{background:rgba(8,145,178,0.15)}
+.client-row.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--teal);border-radius:0 3px 3px 0}
+.client-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0}
+.ca-teal{background:linear-gradient(135deg,var(--teal),#065E7C)}
+.ca-gold{background:linear-gradient(135deg,var(--gold),#92400E)}
+.ca-green{background:linear-gradient(135deg,var(--green),#047857)}
+.ca-purple{background:linear-gradient(135deg,var(--purple),#4C1D95)}
+.ca-blue{background:linear-gradient(135deg,var(--blue),#1D4ED8)}
+.client-info{flex:1;min-width:0}
+.client-name{font-size:12.5px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.client-meta{font-size:10.5px;color:rgba(255,255,255,0.35);margin-top:1px}
+.client-chevron{font-size:10px;color:rgba(255,255,255,0.3);transition:transform 0.2s;flex-shrink:0}
+.client-row.expanded .client-chevron{transform:rotate(90deg)}
+
+/* YEAR ROWS */
+.year-group{display:none;background:rgba(0,0,0,0.15)}
+.year-group.open{display:block}
+.year-row{display:flex;align-items:center;gap:7px;padding:7px 20px 7px 36px;cursor:pointer;transition:all 0.15s;user-select:none}
+.year-row:hover{background:rgba(255,255,255,0.03)}
+.year-row.active{color:var(--teal2)}
+.year-icon{font-size:11px;color:rgba(255,255,255,0.3);width:14px}
+.year-label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.55)}
+.year-row.active .year-label{color:var(--teal2)}
+.year-count{margin-left:auto;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px}
+
+/* PROJECT ROWS */
+.project-group{display:none}
+.project-group.open{display:block}
+.project-item{display:flex;align-items:center;gap:8px;padding:6px 20px 6px 52px;cursor:pointer;transition:all 0.15s;user-select:none}
+.project-item:hover{background:rgba(255,255,255,0.03)}
+.project-item.active{background:rgba(8,145,178,0.1)}
+.proj-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.pd-health{background:var(--teal)}
+.pd-pbm{background:var(--blue)}
+.pd-sl{background:var(--purple)}
+.pd-tpa{background:var(--gold)}
+.pd-dental{background:var(--green2)}
+.pd-vision{background:var(--amber)}
+.pd-life{background:var(--red)}
+.pd-payroll{background:#94A3B8}
+.proj-name{font-size:11.5px;color:rgba(255,255,255,0.5);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-item.active .proj-name{color:var(--white)}
+.proj-status{font-size:8.5px;font-weight:800;padding:1px 6px;border-radius:100px;text-transform:uppercase;flex-shrink:0}
+.ps-active{background:rgba(8,145,178,0.15);color:var(--teal2)}
+.ps-awarded{background:rgba(5,150,105,0.15);color:var(--green2)}
+.ps-draft{background:rgba(100,116,139,0.15);color:var(--slate4)}
+.ps-review{background:rgba(96,165,250,0.15);color:#93C5FD}
+.ps-future{background:rgba(217,119,6,0.1);color:var(--amber);border:1px dashed rgba(217,119,6,0.3)}
+
+/* ADD BUTTON */
+.add-btn{display:flex;align-items:center;gap:6px;padding:5px 20px 5px 52px;cursor:pointer;font-size:11px;color:rgba(255,255,255,0.2);transition:all 0.15s}
+.add-btn:hover{color:var(--teal2)}
+
+.add-client-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 16px 0;padding:8px;border:1.5px dashed rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.3);transition:all 0.15s}
+.add-client-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+/* RIGHT PANEL */
+.main-panel{overflow-y:auto;padding:28px 32px}
+
+/* WELCOME STATE */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px}
+.welcome-icon{font-size:48px;opacity:0.3}
+.welcome-title{font-size:20px;font-weight:800;color:rgba(255,255,255,0.5)}
+.welcome-sub{font-size:13px;color:rgba(255,255,255,0.2);max-width:340px;line-height:1.7}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:20px}
+.breadcrumb span{color:rgba(255,255,255,0.5)}
+.breadcrumb .sep{color:rgba(255,255,255,0.15)}
+.breadcrumb .current{color:var(--white);font-weight:700}
+
+/* CLIENT HEADER */
+.client-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px}
+.client-header-left{display:flex;align-items:center;gap:14px}
+.client-header-avatar{width:52px;height:52px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:white;flex-shrink:0}
+.client-header-info h1{font-size:22px;font-weight:900;color:var(--white);letter-spacing:-0.5px}
+.client-header-info p{font-size:12px;color:rgba(255,255,255,0.4);margin-top:3px}
+.client-tags{display:flex;gap:6px;margin-top:6px}
+.tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;text-transform:uppercase}
+.tag-teal{background:rgba(8,145,178,0.15);color:var(--teal2);border:1px solid rgba(8,145,178,0.2)}
+.tag-gold{background:rgba(201,146,42,0.15);color:#F0B942;border:1px solid rgba(201,146,42,0.2)}
+.tag-green{background:rgba(5,150,105,0.15);color:var(--green2);border:1px solid rgba(5,150,105,0.2)}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.3);margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:900;color:var(--white);letter-spacing:-0.5px;line-height:1}
+.stat-sub{font-size:10.5px;margin-top:4px}
+.sub-green{color:var(--green2)}
+.sub-amber{color:var(--amber)}
+.sub-teal{color:var(--teal2)}
+
+/* SECTION TITLE */
+.section-title{font-size:12px;font-weight:800;color:rgba(255,255,255,0.5);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07)}
+
+/* YEAR BLOCKS */
+.year-block{margin-bottom:20px}
+.year-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;user-select:none}
+.year-badge{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 12px;font-size:13px;font-weight:800;color:rgba(255,255,255,0.6);transition:all 0.15s}
+.year-header:hover .year-badge{border-color:rgba(255,255,255,0.2);color:white}
+.year-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+.year-toggle{font-size:10px;color:rgba(255,255,255,0.2);transition:transform 0.2s}
+.year-block.collapsed .year-toggle{transform:rotate(-90deg)}
+.year-projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.year-block.collapsed .year-projects{display:none}
+
+/* PROJECT CARD */
+.proj-card{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.proj-card:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);transform:translateY(-1px)}
+.proj-card.selected{border-color:var(--teal);background:rgba(8,145,178,0.08)}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.pc-health::before{background:var(--teal)}
+.pc-pbm::before{background:var(--blue)}
+.pc-sl::before{background:var(--purple)}
+.pc-tpa::before{background:var(--gold)}
+.pc-dental::before{background:var(--green2)}
+.pc-vision::before{background:var(--amber)}
+.pc-life::before{background:var(--red)}
+.pc-payroll::before{background:#64748B}
+.proj-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.proj-type-chip{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:100px;text-transform:uppercase}
+.ptc-health{background:rgba(8,145,178,0.15);color:var(--teal2)}
+.ptc-pbm{background:rgba(59,130,246,0.15);color:#93C5FD}
+.ptc-sl{background:rgba(124,58,237,0.15);color:#C4B5FD}
+.ptc-tpa{background:rgba(201,146,42,0.15);color:#F0B942}
+.ptc-dental{background:rgba(16,185,129,0.15);color:var(--green2)}
+.ptc-vision{background:rgba(217,119,6,0.15);color:#FCD34D}
+.ptc-life{background:rgba(220,38,38,0.15);color:#FCA5A5}
+.ptc-payroll{background:rgba(100,116,139,0.15);color:var(--slate4)}
+.proj-card-name{font-size:13px;font-weight:800;color:var(--white);margin-bottom:4px}
+.proj-card-meta{font-size:11px;color:rgba(255,255,255,0.35)}
+.proj-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)}
+.proj-card-date{font-size:10.5px;color:rgba(255,255,255,0.25)}
+.proj-card-savings{font-size:11px;font-weight:700;color:var(--green2)}
+
+/* ADD PROJECT CARD */
+.add-proj-card{background:transparent;border:1.5px dashed rgba(255,255,255,0.1);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:100px}
+.add-proj-card:hover{border-color:var(--teal);background:rgba(8,145,178,0.05)}
+.add-proj-card .add-icon{font-size:20px;color:rgba(255,255,255,0.2)}
+.add-proj-card .add-text{font-size:11.5px;color:rgba(255,255,255,0.25);font-weight:600}
+.add-proj-card:hover .add-icon,.add-proj-card:hover .add-text{color:var(--teal2)}
+
+/* PROJECT DETAIL PANEL */
+.proj-detail{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-top:24px}
+.proj-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.proj-detail-title{font-size:16px;font-weight:900;color:var(--white)}
+.proj-detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.detail-field{background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px}
+.detail-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.3);margin-bottom:5px}
+.detail-value{font-size:13px;font-weight:600;color:var(--white)}
+.detail-value.highlight{color:var(--green2)}
+.detail-value.amber{color:var(--amber)}
+
+/* DB CONCEPT PANEL */
+.db-panel{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-top:24px}
+.db-panel-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.3);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.db-row{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:start;margin-bottom:8px;padding:8px;border-radius:6px;background:rgba(0,0,0,0.15)}
+.db-key{font-family:'DM Mono',monospace;font-size:11px;color:var(--teal2)}
+.db-val{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.6)}
+.db-val.highlight{color:var(--green2)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;backdrop-filter:blur(4px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:#0D1E35;border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;width:480px;transform:translateY(20px);transition:transform 0.2s;box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-title{font-size:18px;font-weight:900;color:var(--white);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);display:block;margin-bottom:7px}
+.form-input{width:100%;padding:9px 12px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--white);outline:none;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--teal)}
+.form-input::placeholder{color:rgba(255,255,255,0.2)}
+.form-select{width:100%;padding:9px 12px;background:#0A1628;border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;font-family:var(--font);font-size:13px;color:var(--white);outline:none;cursor:pointer}
+.form-select option{background:#0D1E35}
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.type-chip{padding:7px 4px;border:1.5px solid rgba(255,255,255,0.1);border-radius:7px;text-align:center;cursor:pointer;transition:all 0.15s;font-size:10.5px;font-weight:700;color:rgba(255,255,255,0.4)}
+.type-chip:hover{border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.7)}
+.type-chip.selected{color:white}
+.tc-Health{border-color:var(--teal);background:rgba(8,145,178,0.15);color:var(--teal2)}
+.tc-PBM{border-color:var(--blue);background:rgba(59,130,246,0.15);color:#93C5FD}
+.tc-Stop-Loss{border-color:var(--purple);background:rgba(124,58,237,0.15);color:#C4B5FD}
+.tc-TPA{border-color:var(--gold);background:rgba(201,146,42,0.15);color:#F0B942}
+.tc-Dental{border-color:var(--green2);background:rgba(16,185,129,0.15);color:var(--green2)}
+.tc-Vision{border-color:var(--amber);background:rgba(217,119,6,0.15);color:#FCD34D}
+.tc-Life{border-color:var(--red);background:rgba(220,38,38,0.15);color:#FCA5A5}
+.tc-Payroll{border-color:#64748B;background:rgba(100,116,139,0.15);color:var(--slate4)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)}
+.btn{padding:9px 18px;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.15s}
+.btn-ghost{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1.5px solid rgba(255,255,255,0.1)}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);color:white}
+.btn-primary{background:var(--teal);color:white}
+.btn-primary:hover{background:#0777A0}
+.btn-gold{background:var(--gold);color:white}
+
+/* CONCEPT EXPLAINER */
+.concept-box{background:rgba(8,145,178,0.06);border:1.5px solid rgba(8,145,178,0.15);border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.concept-box-title{font-size:12px;font-weight:800;color:var(--teal2);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.concept-box-text{font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.7}
+.concept-box-text strong{color:rgba(255,255,255,0.8);font-weight:700}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.4)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.animate{animation:fadeUp 0.25s ease both}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-mark">SF</div>
+    <div class="logo-text">Self<span>Fund</span></div>
+  </div>
+  <div class="header-title">Platform Structure Explorer — Interactive Demo</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.2)">Click anything to explore</div>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT: TREE PANEL -->
+  <div class="tree-panel">
+    <div class="tree-section-label">Clients — Broker: Sarah Chen</div>
+    <div id="tree-clients"></div>
+    <div class="add-client-btn" onclick="showAddClient()">
+      <span>＋</span> Add New Client
+    </div>
+  </div>
+
+  <!-- RIGHT: MAIN PANEL -->
+  <div class="main-panel" id="main-panel">
+    <div class="welcome" id="welcome-state">
+      <div class="welcome-icon">📂</div>
+      <div class="welcome-title">Select a client to explore</div>
+      <div class="welcome-sub">Click any client on the left to see their project history — organized by year, with each RFP and service line as a separate project underneath.</div>
+      <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.15)">Try expanding a client → year → project</div>
+    </div>
+    <div id="client-view" style="display:none"></div>
+  </div>
+
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="add-project-modal">
+  <div class="modal">
+    <div class="modal-title">📋 Add New Project</div>
+    <div class="form-group">
+      <label class="form-label">Project Type</label>
+      <div class="type-grid" id="type-grid">
+        <div class="type-chip" onclick="selectType(this,'Health')">🏥 Health</div>
+        <div class="type-chip" onclick="selectType(this,'PBM')">💊 PBM</div>
+        <div class="type-chip" onclick="selectType(this,'Stop-Loss')">🛡️ Stop-Loss</div>
+        <div class="type-chip" onclick="selectType(this,'TPA')">📋 TPA</div>
+        <div class="type-chip" onclick="selectType(this,'Dental')">🦷 Dental</div>
+        <div class="type-chip" onclick="selectType(this,'Vision')">👁️ Vision</div>
+        <div class="type-chip" onclick="selectType(this,'Life')">❤️ Life</div>
+        <div class="type-chip" onclick="selectType(this,'Payroll')">💵 Payroll</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Plan Year</label>
+      <select class="form-select" id="new-proj-year">
+        <option>2027</option><option>2026</option><option>2025</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Project Name</label>
+      <input class="form-input" id="new-proj-name" placeholder="e.g. PBM Competitive Bid 2027">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="new-proj-status">
+        <option value="draft">Draft</option>
+        <option value="active">Active</option>
+        <option value="review">Under Review</option>
+        <option value="awarded">Awarded</option>
+        <option value="future">Planned (Future)</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-project-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addProject()">Add Project →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="add-client-modal">
+  <div class="modal">
+    <div class="modal-title">👥 Add New Client</div>
+    <div class="form-group">
+      <label class="form-label">Company Name</label>
+      <input class="form-input" id="new-client-name" placeholder="e.g. Hartwell Distribution">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Covered Lives</label>
+      <input class="form-input" id="new-client-lives" placeholder="e.g. 2,400" type="text">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Industry</label>
+      <input class="form-input" id="new-client-industry" placeholder="e.g. Manufacturing, Healthcare, Logistics">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-client-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="addClient()">Add Client →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// DATA
+// ──────────────────────────────────────────────
+const TYPES = {
+  'Health':    {color:'teal',  icon:'🏥', dot:'pd-health',  card:'pc-health', chip:'ptc-health'},
+  'PBM':       {color:'blue',  icon:'💊', dot:'pd-pbm',     card:'pc-pbm',    chip:'ptc-pbm'},
+  'Stop-Loss': {color:'purple',icon:'🛡️', dot:'pd-sl',      card:'pc-sl',     chip:'ptc-sl'},
+  'TPA':       {color:'gold',  icon:'📋', dot:'pd-tpa',     card:'pc-tpa',    chip:'ptc-tpa'},
+  'Dental':    {color:'green', icon:'🦷', dot:'pd-dental',  card:'pc-dental', chip:'ptc-dental'},
+  'Vision':    {color:'amber', icon:'👁️', dot:'pd-vision',  card:'pc-vision', chip:'ptc-vision'},
+  'Life':      {color:'red',   icon:'❤️', dot:'pd-life',    card:'pc-life',   chip:'ptc-life'},
+  'Payroll':   {color:'slate', icon:'💵', dot:'pd-payroll', card:'pc-payroll',chip:'ptc-payroll'},
+};
+
+const STATUS_LABELS = {
+  draft:'Draft', active:'Active', review:'Under Review', awarded:'Awarded ✓', future:'Planned'
+};
+const STATUS_CLASS = {
+  draft:'ps-draft', active:'ps-active', review:'ps-review', awarded:'ps-awarded', future:'ps-future'
+};
+
+let clients = [
+  {
+    id:'c1', name:'Meridian Manufacturing', lives:'3,200', industry:'Manufacturing',
+    color:'ca-teal', initials:'MM', broker:'Sarah Chen',
+    projects:[
+      {id:'p1',type:'PBM',year:2026,name:'PBM Competitive Bid',status:'awarded',savings:'$1.24M',notes:'Capital Rx selected. 21% savings vs legacy PBM.',date:'Jan 1, 2026'},
+      {id:'p2',type:'Stop-Loss',year:2026,name:'Stop-Loss Renewal',status:'review',savings:null,notes:'3 of 5 quotes received. Tokio Marine leading.',date:'Mar 24, 2026'},
+      {id:'p3',type:'TPA',year:2027,name:'TPA Review',status:'draft',savings:null,notes:'Trustmark contract expires Dec 31. Need to benchmark.',date:'Q3 2026'},
+      {id:'p4',type:'Dental',year:2027,name:'Dental RFP',status:'future',savings:null,notes:'Planned after health renewals complete.',date:'Q4 2026'},
+    ]
+  },
+  {
+    id:'c2', name:'Hartwell Distribution', lives:'1,800', industry:'Logistics',
+    color:'ca-gold', initials:'HD', broker:'Sarah Chen',
+    projects:[
+      {id:'p5',type:'Health',year:2025,name:'Full Self-Fund Migration',status:'awarded',savings:'$890K',notes:'Moved from fully insured to self-funded. First year complete.',date:'Jan 1, 2025'},
+      {id:'p6',type:'PBM',year:2026,name:'PBM Carve-Out',status:'active',savings:null,notes:'Q&A period open. 5 vendors invited.',date:'Mar 26, 2026'},
+      {id:'p7',type:'TPA',year:2026,name:'TPA Competitive Bid',status:'active',savings:null,notes:'Runs concurrent with PBM RFP.',date:'Mar 26, 2026'},
+    ]
+  },
+  {
+    id:'c3', name:'Coastal Hospital Group', lives:'5,400', industry:'Healthcare',
+    color:'ca-green', initials:'CH', broker:'Sarah Chen',
+    projects:[
+      {id:'p8',type:'PBM',year:2026,name:'PBM First-Time RFP',status:'active',savings:null,notes:'6 of 8 vendor invitations accepted. Q&A closes Apr 1.',date:'Apr 5, 2026'},
+    ]
+  },
+  {
+    id:'c4', name:'Southeast Logistics', lives:'2,100', industry:'Transportation',
+    color:'ca-purple', initials:'SL', broker:'Sarah Chen',
+    projects:[
+      {id:'p9',type:'TPA',year:2026,name:'TPA Carve-Out',status:'draft',savings:null,notes:'Draft ready. Launch Mar 18.',date:'Apr 15, 2026'},
+      {id:'p10',type:'Vision',year:2027,name:'Vision RFP',status:'future',savings:null,notes:'Ancillary review planned for Q2 2027.',date:'Q2 2027'},
+      {id:'p11',type:'Life',year:2027,name:'Term Life RFP',status:'future',savings:null,notes:'Ancillary review planned for Q2 2027.',date:'Q2 2027'},
+    ]
+  },
+  {
+    id:'c5', name:'Riverview Schools', lives:'890', industry:'Education',
+    color:'ca-blue', initials:'RS', broker:'Sarah Chen',
+    projects:[
+      {id:'p12',type:'Stop-Loss',year:2025,name:'Stop-Loss Renewal',status:'awarded',savings:'$120K',notes:'HM Life selected. Rate cap 12%.',date:'Jul 1, 2025'},
+      {id:'p13',type:'Dental',year:2026,name:'Dental + Vision Bundle',status:'awarded',savings:'$28K',notes:'Guardian selected for dental/vision package.',date:'Jan 1, 2026'},
+      {id:'p14',type:'Payroll',year:2027,name:'Payroll Services RFP',status:'future',savings:null,notes:'Exploring ADP vs Paychex. Not core Self Fund but tracked.',date:'Q1 2027'},
+    ]
+  },
+];
+
+let selectedClientId = null;
+let selectedProjectId = null;
+let addProjectClientId = null;
+let selectedType = null;
+
+// ──────────────────────────────────────────────
+// RENDER TREE
+// ──────────────────────────────────────────────
+function renderTree() {
+  const container = document.getElementById('tree-clients');
+  container.innerHTML = '';
+  clients.forEach(client => {
+    const years = [...new Set(client.projects.map(p => p.year))].sort((a,b)=>b-a);
+    const isExpanded = selectedClientId === client.id;
+    const clientEl = document.createElement('div');
+    clientEl.className = 'tree-section';
+    clientEl.innerHTML = `
+      <div class="client-row ${isExpanded?'active expanded':''}" onclick="selectClient('${client.id}')">
+        <div class="client-avatar ${client.color}">${client.initials}</div>
+        <div class="client-info">
+          <div class="client-name">${client.name}</div>
+          <div class="client-meta">${client.lives} lives · ${client.projects.length} projects</div>
+        </div>
+        <span class="client-chevron">▶</span>
+      </div>
+      <div class="year-group ${isExpanded?'open':''}" id="yg-${client.id}">
+        ${years.map(year => {
+          const yProjects = client.projects.filter(p=>p.year===year);
+          const isYearOpen = isExpanded;
+          return `
+            <div class="year-row" onclick="toggleYear('${client.id}','${year}',this)">
+              <span class="year-icon">📅</span>
+              <span class="year-label">${year}</span>
+              <span class="year-count">${yProjects.length}</span>
+            </div>
+            <div class="project-group ${isYearOpen?'open':''}" id="pg-${client.id}-${year}">
+              ${yProjects.map(p=>`
+                <div class="project-item ${selectedProjectId===p.id?'active':''}" onclick="selectProject('${client.id}','${p.id}')">
+                  <div class="proj-dot ${TYPES[p.type].dot}"></div>
+                  <span class="proj-name">${TYPES[p.type].icon} ${p.name}</span>
+                  <span class="proj-status ${STATUS_CLASS[p.status]}">${STATUS_LABELS[p.status]}</span>
+                </div>
+              `).join('')}
+              <div class="add-btn" onclick="showAddProject('${client.id}','${year}');event.stopPropagation()">＋ Add project</div>
+            </div>
+          `;
+        }).join('')}
+        <div class="add-btn" onclick="showAddProject('${client.id}',null);event.stopPropagation()">＋ Add year / project</div>
+      </div>
+    `;
+    container.appendChild(clientEl);
+  });
+}
+
+function toggleYear(clientId, year, el) {
+  const pg = document.getElementById(`pg-${clientId}-${year}`);
+  pg.classList.toggle('open');
+  event.stopPropagation();
+}
+
+// ──────────────────────────────────────────────
+// SELECT CLIENT
+// ──────────────────────────────────────────────
+function selectClient(id) {
+  selectedClientId = id;
+  selectedProjectId = null;
+  renderTree();
+  renderClientView(id);
+}
+
+function renderClientView(id) {
+  const client = clients.find(c=>c.id===id);
+  if (!client) return;
+  document.getElementById('welcome-state').style.display='none';
+  const view = document.getElementById('client-view');
+  view.style.display='block';
+  view.className='animate';
+
+  const years = [...new Set(client.projects.map(p=>p.year))].sort((a,b)=>b-a);
+  const totalSavings = client.projects.filter(p=>p.savings).map(p=>p.savings).join(' + ') || '—';
+  const activeCount = client.projects.filter(p=>p.status==='active'||p.status==='review').length;
+  const awardedCount = client.projects.filter(p=>p.status==='awarded').length;
+
+  view.innerHTML = `
+    <div class="breadcrumb">
+      <span>All Clients</span>
+      <span class="sep">›</span>
+      <span class="current">${client.name}</span>
+    </div>
+
+    <div class="concept-box">
+      <div class="concept-box-title">💡 How This Works</div>
+      <div class="concept-box-text">
+        <strong>${client.name}</strong> is one client record in the database. Under it, every RFP or service event is a <strong>project</strong> — tagged by type and year. 
+        No folders needed. Filter by year or type to find anything instantly. 
+        Adding Dental or Vision later means adding a project of that type — <strong>zero restructuring required</strong>.
+      </div>
+    </div>
+
+    <div class="client-header">
+      <div class="client-header-left">
+        <div class="client-header-avatar ${client.color}">${client.initials}</div>
+        <div class="client-header-info">
+          <h1>${client.name}</h1>
+          <p>${client.lives} covered lives · ${client.industry} · Broker: ${client.broker}</p>
+          <div class="client-tags">
+            <span class="tag tag-teal">${client.projects.length} Projects</span>
+            <span class="tag tag-gold">${years.length} Plan Year${years.length!==1?'s':''}</span>
+            <span class="tag tag-green">${awardedCount} Awarded</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="showAddProject('${id}',null)">＋ New Project</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Total Projects</div>
+        <div class="stat-value">${client.projects.length}</div>
+        <div class="stat-sub sub-teal">Across ${years.length} plan years</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Active RFPs</div>
+        <div class="stat-value">${activeCount}</div>
+        <div class="stat-sub ${activeCount>0?'sub-amber':'sub-teal'}">${activeCount>0?'In progress':'All complete'}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Awarded</div>
+        <div class="stat-value">${awardedCount}</div>
+        <div class="stat-sub sub-green">Completed RFPs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Service Lines</div>
+        <div class="stat-value">${[...new Set(client.projects.map(p=>p.type))].length}</div>
+        <div class="stat-sub sub-teal">${[...new Set(client.projects.map(p=>p.type))].join(', ')}</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      ${Object.entries(TYPES).map(([t,v])=>`
+        <div class="legend-item"><div class="legend-dot ${v.dot}"></div>${v.icon} ${t}</div>
+      `).join('')}
+    </div>
+
+    <div class="section-title">Project History — All Years</div>
+
+    ${years.map(year => {
+      const yProjects = client.projects.filter(p=>p.year===year);
+      return `
+        <div class="year-block" id="yb-${id}-${year}">
+          <div class="year-header" onclick="toggleYearBlock('${id}','${year}')">
+            <div class="year-badge">${year}</div>
+            <div class="year-line"></div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.2)">${yProjects.length} project${yProjects.length!==1?'s':''}</div>
+            <span class="year-toggle">▼</span>
+          </div>
+          <div class="year-projects">
+            ${yProjects.map(p=>`
+              <div class="proj-card ${TYPES[p.type].card} ${selectedProjectId===p.id?'selected':''}" onclick="selectProject('${id}','${p.id}')">
+                <div class="proj-card-top">
+                  <span class="proj-type-chip ${TYPES[p.type].chip}">${TYPES[p.type].icon} ${p.type}</span>
+                  <span class="proj-status ${STATUS_CLASS[p.status]}">${STATUS_LABELS[p.status]}</span>
+                </div>
+                <div class="proj-card-name">${p.name}</div>
+                <div class="proj-card-meta">${p.notes}</div>
+                <div class="proj-card-footer">
+                  <span class="proj-card-date">📅 ${p.date}</span>
+                  ${p.savings?`<span class="proj-card-savings">💰 ${p.savings} saved</span>`:''}
+                </div>
+              </div>
+            `).join('')}
+            <div class="add-proj-card" onclick="showAddProject('${id}','${year}')">
+              <div class="add-icon">＋</div>
+              <div class="add-text">Add ${year} project</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+
+    <div class="year-block">
+      <div class="add-proj-card" onclick="showAddProject('${id}',null)" style="min-height:70px;border-radius:10px;background:rgba(255,255,255,0.02)">
+        <div class="add-icon" style="font-size:16px">＋</div>
+        <div class="add-text">Start a new plan year or service line</div>
+      </div>
+    </div>
+
+    <div id="proj-detail-area"></div>
+
+    <div class="db-panel">
+      <div class="db-panel-title">🗄️ How This Looks in the Database — No Folders Needed</div>
+      <div class="db-row">
+        <div class="db-key">clients</div>
+        <div class="db-val">id, name, lives, industry, broker_id, created_at</div>
+      </div>
+      <div class="db-row">
+        <div class="db-key">projects</div>
+        <div class="db-val">id, <span style="color:var(--teal2)">client_id</span>, type, plan_year, name, status, savings, notes, deadline</div>
+      </div>
+      <div class="db-row">
+        <div class="db-key">→ Filter by year</div>
+        <div class="db-val highlight">SELECT * FROM projects WHERE client_id = '${id}' AND plan_year = 2026</div>
+      </div>
+      <div class="db-row">
+        <div class="db-key">→ Filter by type</div>
+        <div class="db-val highlight">SELECT * FROM projects WHERE client_id = '${id}' AND type = 'Dental'</div>
+      </div>
+      <div class="db-row">
+        <div class="db-key">→ Add Dental later</div>
+        <div class="db-val" style="color:var(--green2)">INSERT INTO projects (client_id, type, plan_year, name) VALUES ('${id}', 'Dental', 2027, 'Dental RFP')</div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleYearBlock(clientId, year) {
+  const block = document.getElementById(`yb-${clientId}-${year}`);
+  block.classList.toggle('collapsed');
+}
+
+// ──────────────────────────────────────────────
+// SELECT PROJECT
+// ──────────────────────────────────────────────
+function selectProject(clientId, projectId) {
+  selectedClientId = clientId;
+  selectedProjectId = projectId;
+  renderTree();
+  renderClientView(clientId);
+  // Show detail
+  const client = clients.find(c=>c.id===clientId);
+  const proj = client.projects.find(p=>p.id===projectId);
+  const area = document.getElementById('proj-detail-area');
+  area.innerHTML = `
+    <div class="proj-detail animate">
+      <div class="proj-detail-header">
+        <div class="proj-detail-title">${TYPES[proj.type].icon} ${proj.name}</div>
+        <span class="proj-status ${STATUS_CLASS[proj.status]}" style="font-size:11px;padding:4px 10px">${STATUS_LABELS[proj.status]}</span>
+      </div>
+      <div class="proj-detail-grid">
+        <div class="detail-field"><div class="detail-label">Client</div><div class="detail-value">${client.name}</div></div>
+        <div class="detail-field"><div class="detail-label">Type</div><div class="detail-value">${TYPES[proj.type].icon} ${proj.type}</div></div>
+        <div class="detail-field"><div class="detail-label">Plan Year</div><div class="detail-value">${proj.year}</div></div>
+        <div class="detail-field"><div class="detail-label">Deadline</div><div class="detail-value ${proj.status==='active'?'amber':''}">${proj.date}</div></div>
+        <div class="detail-field"><div class="detail-label">Documented Savings</div><div class="detail-value highlight">${proj.savings||'Pending'}</div></div>
+        <div class="detail-field"><div class="detail-label">Broker</div><div class="detail-value">${client.broker}</div></div>
+        <div class="detail-field" style="grid-column:1/-1"><div class="detail-label">Notes</div><div class="detail-value">${proj.notes}</div></div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);font-size:11.5px;color:rgba(255,255,255,0.3);line-height:1.7">
+        💡 <strong style="color:rgba(255,255,255,0.5)">This is one row in the projects table.</strong> 
+        It belongs to ${client.name} via client_id. It has a type (${proj.type}), a plan_year (${proj.year}), and a status. 
+        Adding ${proj.type==='Dental'?'Vision':'Dental'} next year means adding another row with a different type — 
+        <strong style="color:rgba(255,255,255,0.5)">no new tables, no new folders, no restructuring.</strong>
+      </div>
+    </div>
+  `;
+  area.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ──────────────────────────────────────────────
+// ADD PROJECT MODAL
+// ──────────────────────────────────────────────
+function showAddProject(clientId, year) {
+  addProjectClientId = clientId;
+  selectedType = null;
+  document.querySelectorAll('.type-chip').forEach(c=>c.className='type-chip');
+  if (year) document.getElementById('new-proj-year').value = year;
+  document.getElementById('new-proj-name').value = '';
+  document.getElementById('add-project-modal').classList.add('open');
+}
+
+function selectType(el, type) {
+  selectedType = type;
+  document.querySelectorAll('.type-chip').forEach(c=>c.className='type-chip');
+  el.className = `type-chip selected tc-${type.replace(' ','-')}`;
+  // Auto-fill name
+  const year = document.getElementById('new-proj-year').value;
+  document.getElementById('new-proj-name').value = `${type} ${type==='Stop-Loss'?'Renewal':'RFP'} ${year}`;
+}
+
+function addProject() {
+  if (!selectedType) { alert('Please select a project type'); return; }
+  const name = document.getElementById('new-proj-name').value || `${selectedType} RFP`;
+  const year = parseInt(document.getElementById('new-proj-year').value);
+  const status = document.getElementById('new-proj-status').value;
+  const client = clients.find(c=>c.id===addProjectClientId);
+  const newProj = {
+    id: 'p'+Date.now(),
+    type: selectedType,
+    year, name, status,
+    savings: null,
+    notes: 'New project — click to add details.',
+    date: `Plan Year ${year}`
+  };
+  client.projects.push(newProj);
+  closeModal('add-project-modal');
+  selectProject(addProjectClientId, newProj.id);
+}
+
+// ──────────────────────────────────────────────
+// ADD CLIENT MODAL
+// ──────────────────────────────────────────────
+function showAddClient() {
+  document.getElementById('new-client-name').value='';
+  document.getElementById('new-client-lives').value='';
+  document.getElementById('new-client-industry').value='';
+  document.getElementById('add-client-modal').classList.add('open');
+}
+
+function addClient() {
+  const name = document.getElementById('new-client-name').value;
+  if (!name) { alert('Please enter a company name'); return; }
+  const lives = document.getElementById('new-client-lives').value || '—';
+  const industry = document.getElementById('new-client-industry').value || 'General';
+  const colors = ['ca-teal','ca-gold','ca-green','ca-purple','ca-blue'];
+  const newClient = {
+    id: 'c'+Date.now(),
+    name, lives, industry,
+    color: colors[clients.length % colors.length],
+    initials: name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(),
+    broker: 'Sarah Chen',
+    projects: []
+  };
+  clients.push(newClient);
+  closeModal('add-client-modal');
+  selectedClientId = newClient.id;
+  renderTree();
+  renderClientView(newClient.id);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on bg click
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click', e=>{
+    if(e.target===bg) bg.classList.remove('open');
+  });
+});
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+renderTree();
+</script>
+</body>
+</html>
